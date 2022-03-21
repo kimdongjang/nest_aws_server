@@ -8,8 +8,6 @@ RUN npm i
 RUN npm run-script build
 
 
-FROM nginx:1.19.2
-
-WORKDIR /usr/share/nginx/html
+FROM node:lts-alpine3.10
+WORKDIR /react-client
 COPY --from=builder /react-client/build /usr/share/nginx/html
-COPY --from=builder /react-client/nginx.conf /etc/nginx/nginx.conf
