@@ -1,0 +1,46 @@
+version: "3.8"
+
+networks:
+  corp:
+    driver: bridge
+
+services:
+  nest-server:
+    container_name: nest-server
+    build:
+      context: ./
+      cache_from:
+        - my-base-image:nx-base
+      dockerfile: ./apps/nest-server/Dockerfile
+      args:
+        NODE_ENV: "development"
+        BUILD_FLAG: ""
+    image: nest-server:nx-dev
+    ports:
+      - 4939:4939
+    environment:
+      NODE_ENV: "development"
+      PORT: 4939
+    networks:
+      - corp
+    restart: on-failure
+
+  react-client:
+    container_name: react-client
+    build:
+      context: ./
+      cache_from:
+        - nginx:1.19.2
+      dockerfile: ./apps/react-client/Dockerfile
+      args:
+        NODE_ENV: "development"
+        BUILD_FLAG: ""
+    image: react-client:nx-dev
+    ports:
+      - 4900:80
+    environment:
+      NODE_ENV: "development"
+      PORT: 4900
+    networks:
+      - corp
+    restart: on-failure
