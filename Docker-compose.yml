@@ -22,23 +22,6 @@ services:
       - corp
     restart: on-failure
 
-  nginx:
-    container_name: nginx-proxy
-    build:
-      context: ./nginx
-      dockerfile: ./Dockerfile
-      args:
-        NODE_ENV: "development"
-        BUILD_FLAG: ""
-    
-    environment:
-      NODE_ENV: "development"
-      PORT: 80
-    networks:
-      - corp
-    restart: on-failure
-      
-
   react-client:
     container_name: react-client
     build:
