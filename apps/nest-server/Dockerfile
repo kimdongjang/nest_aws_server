@@ -1,15 +1,16 @@
-FROM my-base-image:nx-base AS builder
+FROM node:lts-alpine3.10 as builder
 
 ARG NODE_ENV
 ARG BUILD_FLAG
-WORKDIR /app/builder
+WORKDIR /nest-server
+
 COPY . .
-RUN npm run build
+RUN npm i
+RUN npx @nestjs/cli build
 
-FROM my-base-image:nx-base
+FROM node:lts-alpine3.10
 
-WORKDIR /app
-COPY --from=builder /app/builder ./
+COPY --from=builder /nest-server/dist ./
 ENV NODE_ENV=$NODE_ENV
 
-CMD ["node", "./dist/apps/nest-server/main.js"]
+CMD ["node", "./dist/main.js"]
