@@ -1,1 +1,73 @@
-<mxfile host="app.diagrams.net" modified="2022-03-22T01:18:18.584Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36" version="17.1.3" etag="R0l2eSB6Ndbc6h6myrqf" type="github"><diagram id="NR-jDfcfXjS9t4CEGu84">UzV2zq1wL0osyPDNT0nNUTV2VTV2LsrPL4GwciucU3NyVI0MMlNUjV1UjYwMgFjVyA2HrCFY1qAgsSg1rwSLBiADYTaQg2Y1AA==</diagram></mxfile>
+<mxfile host="app.diagrams.net" modified="2022-03-22T02:37:51.635Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36" etag="_W4YuWYlbHNCekhWxPDN" version="17.1.3" type="github">
+  <diagram id="NR-jDfcfXjS9t4CEGu84" name="Page-1">
+    <mxGraphModel dx="1352" dy="802" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ig8Jf2fUbTpz8dKBl9Jz-1" value="VS Code" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="70" width="90" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ig8Jf2fUbTpz8dKBl9Jz-2" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="130" y="89.5" as="sourcePoint" />
+            <mxPoint x="230" y="89.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ig8Jf2fUbTpz8dKBl9Jz-3" value="Pull" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;" connectable="0" vertex="1" parent="ig8Jf2fUbTpz8dKBl9Jz-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ig8Jf2fUbTpz8dKBl9Jz-4" value="Github" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="230" y="65" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ig8Jf2fUbTpz8dKBl9Jz-5" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" target="ig8Jf2fUbTpz8dKBl9Jz-8">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="254.5" y="120" as="sourcePoint" />
+            <mxPoint x="254.5" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ig8Jf2fUbTpz8dKBl9Jz-6" value="Webhook Build" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=middle;" connectable="0" vertex="1" parent="ig8Jf2fUbTpz8dKBl9Jz-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ig8Jf2fUbTpz8dKBl9Jz-8" value="Jenkins" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="205" y="190" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ig8Jf2fUbTpz8dKBl9Jz-15" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="305" y="204.5" as="sourcePoint" />
+            <mxPoint x="405" y="204.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ig8Jf2fUbTpz8dKBl9Jz-16" value="Pipeline Script" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;" connectable="0" vertex="1" parent="ig8Jf2fUbTpz8dKBl9Jz-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ig8Jf2fUbTpz8dKBl9Jz-17" value="EC2 Docker" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="410" y="155" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ig8Jf2fUbTpz8dKBl9Jz-19" value="Container&lt;br&gt;- Project" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="175" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ig8Jf2fUbTpz8dKBl9Jz-20" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="470" y="204.5" as="sourcePoint" />
+            <mxPoint x="600" y="205" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ig8Jf2fUbTpz8dKBl9Jz-21" value="Docker Compose" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=bottom;" connectable="0" vertex="1" parent="ig8Jf2fUbTpz8dKBl9Jz-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ig8Jf2fUbTpz8dKBl9Jz-25" value="EC2 Docker Container&lt;br&gt;- Jenkins&lt;br&gt;- Project" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="280" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ig8Jf2fUbTpz8dKBl9Jz-26" value="Result" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="585" y="260" width="50" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ig8Jf2fUbTpz8dKBl9Jz-27" value="prepare&lt;br&gt;build&lt;br&gt;deploy" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="330" y="210" width="60" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ig8Jf2fUbTpz8dKBl9Jz-28" value="EC2 &amp;lt;-&amp;gt; sock, volume" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="187.5" y="220" width="135" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
