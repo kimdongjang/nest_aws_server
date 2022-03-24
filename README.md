@@ -13,3 +13,5 @@ ec2가 메인 호스트고
 포트 정보
 nest-server : 4939
 react-client : 4900(80)
+
+빌드 테스트 중1
