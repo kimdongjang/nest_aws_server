@@ -1,14 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-interface IState {
-  value: number;
-}
-
-// or
-
-type TState = {
-  value: number;
-};
+import { IState } from './type';
 
 const initialState: IState = { value: 0 };
 
