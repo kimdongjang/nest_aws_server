@@ -1,12 +1,12 @@
-import React, { useRef } from "react";
+import React, { FormEventHandler, useRef } from "react";
 import emailjs from '@emailjs/browser';
 
 type Props = {};
 
 export default function MailForm(props: any) {
-    const form = useRef();
+    const form = useRef<HTMLInputElement>(null);
 
-    const sendEmail = (e) => {
+    const sendEmail = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         emailjs.sendForm('service_id', 'template_id', form.current, 'user_id').
@@ -15,7 +15,7 @@ export default function MailForm(props: any) {
             })
     }
 
-    return <div><form className="form" onSubmit={sendEmail} ref={form}>
+    return <div><form className="form" onSubmit={sendEmail} >
         <p>Your Name:</p>
         <input name='name' type='text' placeholder="name" className="form__input" />
         <p>Subject:</p>
