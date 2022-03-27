@@ -3,7 +3,7 @@ import emailjs from '@emailjs/browser';
 
 type Props = {};
 
-export default function MailForm() {
+export default function MailForm(props: any) {
     const form = useRef();
 
     const sendEmail = (e) => {
