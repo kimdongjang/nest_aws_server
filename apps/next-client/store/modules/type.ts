@@ -1,10 +1,8 @@
-export interface IState {
-    value: number;
-  }
-  
-  // or
-  
-  export type TState = {
-    value: number;
-  };
-  
+import { ActionType } from "typesafe-actions";
+import * as actions from './actions'
+
+export type IState = {
+  value: Array<string>;
+};
+
+export type IStateAction = ActionType<typeof actions>;
