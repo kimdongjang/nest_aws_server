@@ -3,11 +3,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { EmailService } from './EmailService';
 
 @Module({
   imports: [
     MailerModule.forRoot({
-      transport: 'smtps://user@domain.com:pass@smtp.domain.com',
+      transport: 'smtps://smtp.gmail.com:naru3644@gmail.com',
       defaults: {
         from: '"nest-modules" <modules@nestjs.com>',
       },
@@ -21,6 +22,6 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [EmailService],
 })
-export class AppModule {}
+export class AppModule { }

@@ -1,8 +1,18 @@
-import '../styles/globals.css'
-import type { AppProps } from 'next/app'
+import { AppProps } from 'next/app'
+import { ThemeProvider } from 'styled-components';
+import { wrapper } from 'store';
 
-function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+// import '../styles/globals.css'
+import GlobalStyle from 'styles/global-styles';
+import { theme } from 'styles/theme';
+
+const MyApp = ({ Component, pageProps }: AppProps) => {
+  return (
+    <ThemeProvider theme={theme}>
+      <GlobalStyle />
+      <Component {...pageProps} />
+    </ThemeProvider>
+  )
 }
 
-export default MyApp
+export default wrapper.withRedux(MyApp)

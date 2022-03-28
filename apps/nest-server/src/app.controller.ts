@@ -1,18 +1,19 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { AppService } from './app.service';
+import { EmailService } from './EmailService';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly emailService: EmailService) { }
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
+  // @Get()
+  // getHello(): string {
+  //   return this.appService.getHello();
+  // }
   @Get('/sendMail')
   async sendMail(@Param('email') email) {
-    const config = this.mailService.mailConfig(email);
-    const result = await this.mailService.sendMail(config);
+    const config = this.emailService.mailConfig(email);
+    const result = await this.emailService.sendMail(config);
     return result;
   }
 }

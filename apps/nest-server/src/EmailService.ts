@@ -1,8 +1,10 @@
 import { MailerService } from '@nestjs-modules/mailer';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class EmailService {
   // 생성자
-  constructor(private readonly mailerService: MailerService) {}
+  constructor(private readonly mailerService: MailerService) { }
 
   async sendMail(config) {
     await this.mailerService.sendMail(config);
@@ -29,7 +31,7 @@ export class EmailService {
         text: 'welcome', // plaintext body
         html: '<b>welcome</b>', // HTML body content
       })
-      .then(() => {})
-      .catch(() => {});
+      .then(() => { })
+      .catch(() => { });
   }
 }
