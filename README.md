@@ -15,3 +15,15 @@ nest-server : 4939
 react-client : 4900(80)
 
 빌드 테스트 중4
+
+
+---
+
+# SMTP 설정파일
+# .env
+```
+EMAIL_AUTH_EMAIL=naru3644@gmail.com
+EMAIL_AUTH_PASSWORD=패스워드
+EMAIL_HOST=smtp.gmail.com
+EMAIL_FROM_USER_NAME=naru3644
+```
