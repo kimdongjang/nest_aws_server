@@ -13,7 +13,9 @@ export class AppController {
   @Get('/sendMail')
   async sendMail(@Param('email') email) {
     const config = this.emailService.mailConfig(email);
+    console.log(config)
     const result = await this.emailService.sendMail(config);
+    console.log(result)
     return result;
   }
 }

@@ -1,5 +1,5 @@
 import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable } from '@nestjs/common';
+import { Get, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class EmailService {
@@ -32,6 +32,6 @@ export class EmailService {
         html: '<b>welcome</b>', // HTML body content
       })
       .then(() => { })
-      .catch(() => { });
+      .catch((err) => {console.log(err) });
   }
 }
