@@ -1,5 +1,5 @@
 import { createReducer } from "typesafe-actions";
-import { ADD_TODO, DELETE_TODO } from "./actions";
+import { ADD_TODO, DELETE_TODO } from "./todoActions";
 import { IState, IStateAction } from "./type";
 import produce from 'immer';
 

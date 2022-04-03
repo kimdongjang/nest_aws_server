@@ -3,8 +3,8 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { RootState } from '../store/modules'
-import { addTodo } from '../store/modules/actions'
+import { RootState } from '../store/todo'
+import { addTodo } from '../store/todo/todoActions'
 import styles from '../styles/Home.module.css'
 
 const Home: NextPage = () => {
