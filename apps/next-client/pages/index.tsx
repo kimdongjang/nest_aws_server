@@ -13,7 +13,7 @@ const Home: NextPage = () => {
   const data = useSelector((state: RootState) => state.todoReducer)
   useEffect(() => {
     dispatch(addTodo({ value: "test1" }));
-  });
+  }, []);
 
   const pushEvent = useCallback(() => {
     console.log("click")
@@ -24,7 +24,7 @@ const Home: NextPage = () => {
       <div>
         <button onClick={pushEvent}>Push Button</button>
         {/* <div>{data}</div> */}
-        <ul>{data.value.map((data) => { <li>{data}</li> })}</ul>
+        <ul>{data.value.map((data: string) => { <li>{data}</li> })}</ul>
       </div>
     </div>
   )
