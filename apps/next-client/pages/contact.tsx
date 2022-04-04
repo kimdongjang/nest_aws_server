@@ -1,5 +1,5 @@
 import React from "react";
-import MailForm from "../component/contact/MailForm";
+import MailForm from "../components/contact/MailForm";
 
 type Props = {};
 

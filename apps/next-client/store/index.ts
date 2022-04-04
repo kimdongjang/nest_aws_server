@@ -4,7 +4,7 @@ import { MakeStore, createWrapper, Context, HYDRATE } from "next-redux-wrapper";
 import { IState } from "./todo/type";
 import thunkMiddleware from 'redux-thunk'
 import { Reducer } from "typesafe-actions";
-import { composeWithDevTools } from "@reduxjs/toolkit/dist/devtoolsExtension";
+import { composeWithDevTools } from "redux-devtools-extension";
 
 export interface AppState {
     todo: IState

@@ -10,5 +10,6 @@ export const DELETE_TODO = "todo/DELETE_TODO";
 // 액션 함수
 // 1. action type
 // 2. payload
-export const addTodo = createStandardAction(ADD_TODO)<{ value: string }>();
+// export const addTodo = createStandardAction(ADD_TODO)<{payload: string}>();
+export const addTodo = createStandardAction(ADD_TODO)();
 export const deleteTodo = createStandardAction(DELETE_TODO)();
