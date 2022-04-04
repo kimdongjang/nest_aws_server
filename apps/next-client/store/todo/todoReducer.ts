@@ -4,16 +4,17 @@ import { IState, IStateAction } from "./type";
 import produce from 'immer';
 
 
-const initialState: IState = { value:0 };
+const initialState: IState = { value: [] };
 
 const todoReducer = createReducer<IState, IStateAction>(initialState, {
     [ADD_TODO]: (state, action) =>
         produce(state, draft => {
-            draft.value += 1
+            state.value.push(action.payload.value)
+            // draft.value += 1
         }),
     [DELETE_TODO]: (state, action) =>
         produce(state, draft => {
-            draft.value -= 1
+            // draft.value -= 1
         })
 });
 

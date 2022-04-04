@@ -12,19 +12,19 @@ const Home: NextPage = () => {
   const dispatch = useDispatch();
   const data = useSelector((state: RootState) => state.todoReducer)
   useEffect(() => {
-    dispatch(addTodo());
-  }, );
+    dispatch(addTodo({ value: "test1" }));
+  });
 
   const pushEvent = useCallback(() => {
     console.log("click")
-    dispatch(addTodo());
+    dispatch(addTodo({ value: "test1" }));
   }, [])
   return (
     <div>Welcome to Next.js!
       <div>
         <button onClick={pushEvent}>Push Button</button>
-        <div>{data}</div>
-        {/* <ul>{data.value.map((data)=>{ <li>{data}</li>})}</ul> */}
+        {/* <div>{data}</div> */}
+        <ul>{data.value.map((data) => { <li>{data}</li> })}</ul>
       </div>
     </div>
   )
