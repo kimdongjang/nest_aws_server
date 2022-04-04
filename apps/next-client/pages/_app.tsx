@@ -1,13 +1,16 @@
+import { NextPage } from 'next';
 import { AppProps } from 'next/app'
-import { ThemeProvider } from 'styled-components';
-import { storeWrapper } from '../store';
+import wrapper from '../store';
+
 
 // import '../styles/globals.css'
 
-const MyApp = ({ Component, pageProps }: AppProps) => {
+const MyApp: NextPage<AppProps> = ({ Component, pageProps }: AppProps) => {
   return (
-    <Component {...pageProps} />
-  )
-}
+    <>
+      <Component {...pageProps} />
+    </>
+  );
+};
 
-export default storeWrapper.withRedux(MyApp)
+export default wrapper.withRedux(MyApp);
