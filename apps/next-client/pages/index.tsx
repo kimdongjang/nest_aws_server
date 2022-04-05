@@ -3,31 +3,31 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { RootState } from '../store/todo'
-import { addTodo } from '../store/todo/todoActions'
-import { IState } from '../store/todo/type'
+import { Product } from '../interfaces/Product'
+import { productsActions, RootState } from '../modules/reducers/productReducer'
 import styles from '../styles/Home.module.css'
 
 const Home: NextPage = () => {
   const dispatch = useDispatch();
-  const data = useSelector((state: RootState) => state.todoReducer)
+  const data:Product = useSelector((state: RootState) => state.data)
+  
   useEffect(() => {
-    dispatch(addTodo({ value: "test1" }));
+    dispatch(productsActions.getProducts());
   }, []);
 
   const pushEvent = useCallback(() => {
-    console.log("click")
-    dispatch(addTodo({ value: "test1" }));
+    dispatch(productsActions.getProducts());
   }, [])
   return (
     <div>Welcome to Next.js!
       <div>
         <button onClick={pushEvent}>Push Button</button>
-        {/* <div>{data}</div> */}
-        <ul>{data.value.map((data: string) => { <li>{data}</li> })}</ul>
+        <Image src={data?.message} alt="test" width={500} height={500}></Image>
+        <div>{data?.message}
+        </div>
       </div>
     </div>
   )
 }
 
-export default Home
+export default Home;
