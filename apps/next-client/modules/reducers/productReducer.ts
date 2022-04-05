@@ -2,13 +2,13 @@ import { createSlice } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import { Product } from "../../interfaces/Product";
 
-export interface ProductState {
+export interface ProductApi {
     loading: boolean;
     data: Product;
     error: AxiosError | null;
 }
 
-const initialState: ProductState = {
+const initialState: ProductApi = {
     loading: false,
     data: { message:"https://images.dog.ceo/breeds/newfoundland/n02111277_7377.jpg", status:"test"},
     error: null    
@@ -36,7 +36,10 @@ const productsSlice = createSlice({
 })
 // 정의한 액션과 리듀서를 export한다.
 export const productsActions = productsSlice.actions;
+// 아래와 같이 actions을 명시하는 것도 가능하다.
+//export const {getProducts,getProductsSuccess,getProductsError } = productsSlice.actions;
 
-export type RootState = ReturnType<typeof productsSlice.reducer>;
+// reducer의 RootState 타입을 지정
+export type ProductState = ReturnType<typeof productsSlice.reducer>;
 
 export default productsSlice;

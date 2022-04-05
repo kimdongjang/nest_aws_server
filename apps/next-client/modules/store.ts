@@ -5,6 +5,7 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import createSagaMiddleware from "redux-saga";
 import rootSaga from "./sagas";
 import productsSlice from "./reducers/productReducer"
+import rootReducer from "./reducers";
 
 
 // 미들웨어 끼리 묶음
@@ -25,7 +26,7 @@ const bindMiddleware = (middlewares: Middleware[]): StoreEnhancer => {
 export const makeStore = () => {
   const sagaMiddleware = createSagaMiddleware();
 
-  const store = createStore(productsSlice.reducer, bindMiddleware([sagaMiddleware]));
+  const store = createStore(rootReducer, bindMiddleware([sagaMiddleware]));
 
   sagaMiddleware.run(rootSaga);
 

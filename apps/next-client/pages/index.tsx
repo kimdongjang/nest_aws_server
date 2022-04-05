@@ -4,12 +4,12 @@ import Image from 'next/image'
 import { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Product } from '../interfaces/Product'
-import { productsActions, RootState } from '../modules/reducers/productReducer'
+import { productsActions, ProductState } from '../modules/reducers/productReducer'
 import styles from '../styles/Home.module.css'
 
 const Home: NextPage = () => {
   const dispatch = useDispatch();
-  const data:Product = useSelector((state: RootState) => state.data)
+  const data:Product = useSelector((state: ProductState) => state.data)
   
   useEffect(() => {
     dispatch(productsActions.getProducts());
