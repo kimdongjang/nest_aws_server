@@ -20,14 +20,14 @@ import { UserModule } from './user/user.module';
                 console.log(config.get('email'));
                 console.log(__dirname)
                 return {
-                ...config.get('email'),                
-                template: {
-                    dir: path.join(__dirname, '/templates/'),
-                    adapter: new EjsAdapter(),
-                    options: {
-                    strict: true,
+                    ...config.get('email'),                
+                    template: {
+                        dir: path.join(__dirname, '/templates/'),
+                        adapter: new EjsAdapter(),
+                        options: {
+                        strict: true,
+                        },
                     },
-                },
                 };
             },
         }),

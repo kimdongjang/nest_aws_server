@@ -1,21 +1,19 @@
 import { NextPage } from "next";
 import { AppProps } from "next/app";
 import React, { ReactElement, ReactNode } from "react";
-import NavLayout from "../components/Layout";
+import { ThemeProvider } from "styled-components";
+import Layout from "../components/Layout";
 import { wrapper } from "../modules/store";
+import theme from "../styles/theme";
 
-type NextPageWithLayout = NextPage & {
-  getLayout?: (page: ReactElement) => ReactNode
-}
-
-type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout
-}
-
-function MyApp({ Component, pageProps }: AppPropsWithLayout) {
-  const getLayout = Component.getLayout ?? ((page) => page)
-
-  return getLayout(<Component {...pageProps} />);
+function MyApp({ Component, pageProps }: AppProps) {
+  return <>
+    <ThemeProvider theme={theme}>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+    </ThemeProvider>
+  </>
 };
 
 export default wrapper.withRedux(MyApp);

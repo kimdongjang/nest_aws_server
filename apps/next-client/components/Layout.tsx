@@ -1,14 +1,19 @@
-// components/layout.js
+import Head from "next/head"
+import Navbar from "./Navbar";
 
-import Navbar from './Navbar'
-import Footer from './Footer'
+type AppLayoutProps = {
+    children: React.ReactNode;
+};
 
-export default function Layout({children}:any) {
-  return (
-    <>
-      <Navbar />
-        <main>{children}</main>
-      <Footer />
-    </>
-  )
+export default function Layout({ children }: AppLayoutProps) {
+    return (
+        <>
+            <Head>
+                <title>Hello</title>
+            </Head>
+            <Navbar></Navbar>
+
+            <div>{children}</div>
+        </>
+    )
 }

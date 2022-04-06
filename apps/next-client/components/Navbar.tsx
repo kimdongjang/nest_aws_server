@@ -1,9 +1,19 @@
-import React from 'react'
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 
-type Props = {}
-
-export default function Navbar({}: Props) {
+export default function Navbar() {
   return (
-    <div>Navbar</div>
+    <ul>
+      <li>
+        <Link href="/">
+          <a>Home</a>
+        </Link>
+      </li>
+      <li>
+        <Link href="/contact">
+          <a>Contact Us</a>
+        </Link>
+      </li>
+    </ul>
   )
 }
