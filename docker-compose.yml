@@ -22,21 +22,36 @@ services:
       - corp
     restart: on-failure
 
-  react-client:
-    container_name: react-client
+  nextjs:
     build:
-      context: ./apps/react-client
-      cache_from:
-        - nginx:1.19.2
+      context: ./apps/next-client
       dockerfile: ./Dockerfile
-      args:
+      args:      
         NODE_ENV: "development"
         BUILD_FLAG: ""
+
+  nginx:
+    build: 
+      context: ./apps/next-client/nginx
+      dockerfile: ./Dockerfile
     ports:
-      - 4900:80
-    environment:
-      NODE_ENV: "development"
-      PORT: 4900
-    networks:
-      - corp
-    restart: on-failure
+      - 80:80
+
+  # react-client:
+  #   container_name: react-client
+  #   build:
+  #     context: ./apps/react-client
+  #     cache_from:
+  #       - nginx:1.19.2
+  #     dockerfile: ./Dockerfile
+  #     args:
+  #       NODE_ENV: "development"
+  #       BUILD_FLAG: ""
+  #   ports:
+  #     - 4900:80
+  #   environment:
+  #     NODE_ENV: "development"
+  #     PORT: 4900
+  #   networks:
+  #     - corp
+  #   restart: on-failure
