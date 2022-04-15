@@ -2,9 +2,13 @@ import Link from 'next/link';
 import React from 'react'
 import { post } from '../types/post';
 import style from '../styles/board.module.css'
+import { useRouter } from 'next/router';
 
 function boards(props: any) {
-    console.log(props)
+    const router = useRouter()
+    const handlePostClick = (row:string) => {
+        router.push(`/boards/posts?title=`+row);
+    }
     return <div>
         <div className={style.tableWrap}>
         <table className={style.tableColumnList}>
@@ -15,7 +19,7 @@ function boards(props: any) {
                 <col width="120" />
             </colgroup>
             <thead>
-                <tr>
+                <tr >
                     <th className={style.tableColumnListHeader}>번호</th>
                     <th className={style.tableColumnListHeader}>제목</th>
                     <th className={style.tableColumnListHeader}>등록일</th>
@@ -24,11 +28,11 @@ function boards(props: any) {
             </thead>
             <tbody>            
                 {props && props.posts.map((value: post, index: any) => (
-                        <tr>
-                        <td key={index}>{value.post_id}</td>
-                        <td key={index}>{value.title}</td>
-                        <td key={index}>{value.apply_date}</td>
-                        <td key={index}>{value.count}</td>
+                        <tr onClick={()=>handlePostClick(value.title)}>s
+                        <td className={style.tableColumnListData} key={index}>{value.post_id}</td>
+                        <td className={style.tableColumnListData} key={index}>{value.title}</td>
+                        <td className={style.tableColumnListData} key={index}>{value.apply_date}</td>
+                        <td className={style.tableColumnListData} key={index}>{value.count}</td>
                         </tr>
                 ))}
                
