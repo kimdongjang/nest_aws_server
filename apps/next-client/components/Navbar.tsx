@@ -14,6 +14,11 @@ export default function Navbar() {
           <a>Contact Us</a>
         </Link>
       </li>
+      <li>
+        <Link href="/boards">
+          <a>게시판</a>
+        </Link>
+      </li>
     </ul>
   )
 }
