@@ -1,0 +1,14 @@
+.imageSlideWrap{
+
+}
+
+.imageSliderContainer{
+    overflow: hidden;
+    max-width: 480px;
+    min-width: 280px;
+    width: 100%;
+}
+.imageContent{
+    width: auto;
+    height: auto;
+}
