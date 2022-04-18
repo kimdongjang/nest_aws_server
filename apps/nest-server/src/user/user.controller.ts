@@ -1,13 +1,13 @@
-import {Controller, Get} from '@nestjs/common';
+import {Controller, Get, Post} from '@nestjs/common';
 import { EmailService } from 'src/email/email.service';
 
 @Controller('user')
 export class UserController {
     constructor(private readonly emailService: EmailService){}
 
-    @Get('/signin')
+    @Get('/sendEmail')
     async signin() {
-        await this.emailService.sendTo('v.hzent@gmail.com');
+        await this.emailService.sendTo('naru3644@gmail.com');
         return 'signin';
     }
 }
