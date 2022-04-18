@@ -28,7 +28,7 @@ function boards(props: any) {
             </thead>
             <tbody>            
                 {props && props.posts.map((value: post, index: any) => (
-                        <tr onClick={()=>handlePostClick(value.title)}>s
+                        <tr onClick={()=>handlePostClick(value.title)}>
                         <td className={style.tableColumnListData} key={index}>{value.post_id}</td>
                         <td className={style.tableColumnListData} key={index}>{value.title}</td>
                         <td className={style.tableColumnListData} key={index}>{value.apply_date}</td>
