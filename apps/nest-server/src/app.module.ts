@@ -6,6 +6,13 @@ import configEmail from './config/email';
 import * as path  from 'path';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './auth/constatns';
+import { AuthService } from './auth/auth.service';
+import { LocalStrategy } from './auth/local.strategy';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
     imports: [
@@ -35,5 +42,11 @@ import { AuthModule } from './auth/auth.module';
         UserModule,
         AuthModule,
     ],
+    providers:[
+        // {
+        //     provide: APP_GUARD,
+        //     useClass: JwtAuthGuard,
+        // }
+    ]
 })
 export class AppModule {}
