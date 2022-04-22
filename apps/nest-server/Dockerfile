@@ -14,6 +14,6 @@ FROM node:lts-alpine3.10
 
 WORKDIR /nest-server
 COPY --from=builder /nest-server/builder ./
-ENV NODE_ENV=$NODE_ENV
+# ENV NODE_ENV=$NODE_ENV
 
 CMD ["node", "./dist/main.js"]

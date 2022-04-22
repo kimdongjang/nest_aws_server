@@ -4,6 +4,7 @@ import { ExtractJwt } from "passport-jwt";
 import { Strategy } from "passport-jwt";
 import { jwtConstants } from "./constatns";
 
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy){
     constructor(){

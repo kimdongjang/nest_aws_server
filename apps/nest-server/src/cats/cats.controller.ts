@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Post, Res } from '@nestjs/common';
 import { CreateCatDto } from './create-cat.dto';
 import { Response } from 'express';
 import { Roles } from 'src/role/Roles.decorator';
@@ -15,6 +15,11 @@ export class CatsController {
     async create(@Body() CreateCatDto: CreateCatDto){
         this.catsService.create(CreateCatDto);        
         return 'this action adds a new cat';
+    }
+
+    @Get('/:id')
+    getOne(@Param('id') movieId: string): string {
+        return `this will return one movie, id: ${movieId}`;
     }
 
     @Get()
