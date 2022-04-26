@@ -1,3 +1,4 @@
+
 import { UnprocessableEntityException } from "@nestjs/common";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
@@ -11,6 +12,8 @@ export class UserEntity {
     username: string;
     @Column()
     password: string;
-    @Column()
+    @Column({ default: false })
     isactive: boolean;
+    @Column()
+    signupVerifyToken: string;
 }

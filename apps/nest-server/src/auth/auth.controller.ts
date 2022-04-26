@@ -1,21 +1,12 @@
 import { Controller, Get, Post, Req, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
+import { CustomGuard } from './passsport/custom.guard';
 import { JwtAuthGuard } from './passsport/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
     constructor(private authService:AuthService){}
-
-    @Get('google')
-    @UseGuards(AuthGuard('google'))
-    async googleAuth(@Req() req){}
-
-    @Get('google/callback')
-    @UseGuards(AuthGuard('google'))
-    googleAuthRedirect(@Req() req){
-        return this.authService.googleLogin(req);
-    }
 
     // 이름과 패스워드 받아서 로그인
     // auth 처리가 안되어있기 때문에 에러
@@ -33,10 +24,28 @@ export class AuthController {
         return this.authService.login(req);
     }
 
+    
+    @Get('google')
+    @UseGuards(AuthGuard('google'))
+    async googleAuth(@Req() req){}
+
+    @Get('google/callback')
+    @UseGuards(AuthGuard('google'))
+    googleAuthRedirect(@Req() req){
+        return this.authService.googleLogin(req);
+    }
+
+
     @UseGuards(JwtAuthGuard)
     @Get('/profile')
     getProfile(@Request() req){
         return req.user;
+    }
+
+    @UseGuards(CustomGuard)
+    @Get(':custom/login')
+    getHello(): string {
+        return "hi";
     }
 
 }

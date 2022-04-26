@@ -1,4 +1,7 @@
 <div> 
-    <h1><%= locals.email %> 에서 보냅니다.</h1>
-    <h1>접속시간<%= locals.datetime %></h1>
-  </div>
+  <h1><%= locals.email %> 에서 보냅니다.</h1>    
+    <form action="<%=locals.url%>" method="POST">
+      <button>가입확인</button>
+    </form>
+  <p>접속시간<%= locals.datetime %></p>
+</div>
