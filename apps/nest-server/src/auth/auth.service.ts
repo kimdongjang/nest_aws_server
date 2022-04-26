@@ -6,6 +6,7 @@ import { ConfigType } from '@nestjs/config';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { LocalAuthGuard } from './passsport/local-auth.guard';
+import { jwtConfig } from '../config/jwt.config'
 
 // username과 password를 통해 인증을 진행
 // 한번 인증되었다면 서버는 특정 request에서 인증 상태를 확인하기 위해 jwt를 발급
@@ -38,9 +39,9 @@ export class AuthService {
             email,
             password
         }
-        return {
-            access_token: this.jwtService.sign(payload),
-        };
+        // access_token: this.jwtService.sign({ payload, jwtConfig.secret),
+        return jwt.sign(payload, jwtConfig.secret);
+
     }
 
     // 이메일 검사

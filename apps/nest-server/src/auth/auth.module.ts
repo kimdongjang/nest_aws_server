@@ -8,12 +8,10 @@ import { JwtAuthGuard } from './passsport/jwt-auth.guard';
 import { GoogleStrategy } from './passsport/google.strategy';
 import { JwtStrategy } from './passsport/jwt.strategy';
 import { LocalStrategy } from './passsport/local.strategy';
-import { UsersModule } from 'src/users/users.module';
 import { jwtConfig } from 'src/config/jwt.config';
 
 @Module({
   imports: [
-    UsersModule,
     PassportModule,
     JwtModule.register({
       secret: jwtConfig.secret,

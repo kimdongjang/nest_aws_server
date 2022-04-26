@@ -1,12 +1,11 @@
-import {MiddlewareConsumer, Module, NestModule} from '@nestjs/common';
-import {MailerModule} from '@nestjs-modules/mailer';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MailerModule } from '@nestjs-modules/mailer';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
-import {ConfigModule, ConfigService} from '@nestjs/config';
-import * as path  from 'path';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import * as path from 'path';
 import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from './auth/passsport/constatns';
 import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/passsport/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
@@ -27,15 +26,15 @@ import emailConfig from './config/email.config';
         // 동적 모듈 = ConfigModule의 forRoot 메서드는 DynamicModule을 리턴하는 정적 메서드임
         ConfigModule.forRoot({
             isGlobal: true,
-            load: [emailConfig],    
-            envFilePath: (process.env.NODE_ENV === 'production') ? '.production.env' : '.development.env'    
+            load: [emailConfig],
+            envFilePath: (process.env.NODE_ENV === 'production') ? '.production.env' : '.development.env'
         }),
-        TypeOrmModule.forRoot({    
+        TypeOrmModule.forRoot({
             type: 'mysql',
-            host: process.env.DATABASE_HOST, 
+            host: process.env.DATABASE_HOST,
             port: 3306,
-            username: process.env.DATABASE_USERNAME, 
-            password: process.env.DATABASE_PASSWORD, 
+            username: process.env.DATABASE_USERNAME,
+            password: process.env.DATABASE_PASSWORD,
             database: 'maindatabase',
             entities: [__dirname + '/**/*.entity{.ts,.js}'],
             synchronize: Boolean(process.env.DATABASE_SYNCHRONIZE), // true,      
@@ -48,12 +47,12 @@ import emailConfig from './config/email.config';
                 console.log(config.get('email'));
                 console.log(__dirname)
                 return {
-                    ...config.get('email'),                
+                    ...config.get('email'),
                     template: {
                         dir: path.join(__dirname, '/templates/'),
                         adapter: new EjsAdapter(),
                         options: {
-                        strict: true,
+                            strict: true,
                         },
                     },
                 };
@@ -64,11 +63,11 @@ import emailConfig from './config/email.config';
         UsersModule,
     ],
 })
-export class AppModule implements NestModule{
-    constructor(private connection: Connection) {}
+export class AppModule implements NestModule {
+    constructor(private connection: Connection) { }
     configure(consumer: MiddlewareConsumer) {
         consumer
-          .apply(LoggerMiddleware)
-          .forRoutes('/users');        
+            .apply(LoggerMiddleware)
+            .forRoutes('/users');
     }
 }
