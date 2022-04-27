@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException, UseGuards } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import * as jwt from "jsonwebtoken"
