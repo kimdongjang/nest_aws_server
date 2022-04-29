@@ -1,4 +1,4 @@
-import { IsBoolean, IsEmail, IsString } from "class-validator";
+import { IsBoolean, IsEmail, IsString, Matches } from "class-validator";
 
 export class CreateUserDto {
     @IsEmail()
@@ -6,6 +6,7 @@ export class CreateUserDto {
     @IsString()
     readonly username: string;
     @IsString()
+    @Matches(/^[A-Za-z\d!@#$%^&*()]{8,30}$/)
     readonly password:string;
     @IsBoolean()
     readonly isactive:boolean;

@@ -9,6 +9,11 @@ import { GoogleStrategy } from './passsport/google.strategy';
 import { JwtStrategy } from './passsport/jwt.strategy';
 import { LocalStrategy } from './passsport/local.strategy';
 import { jwtConfig } from 'src/config/jwt.config';
+import { UsersModule } from 'src/users/users.module';
+import { UsersService } from 'src/users/users.service';
+import { Repository } from 'typeorm';
+import { UserEntity } from 'src/users/entities/user.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -17,9 +22,10 @@ import { jwtConfig } from 'src/config/jwt.config';
       secret: jwtConfig.secret,
       signOptions: { expiresIn: '60s' },
     }),
+    UsersModule,
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy],
-  exports: [AuthService],
+  exports: [AuthService, JwtModule],
   controllers: [AuthController]
 })
 export class AuthModule { }
