@@ -1,51 +1,102 @@
-import { Controller, Get, Post, Req, Request, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from './auth.service';
-import { CustomGuard } from './passsport/custom.guard';
-import { JwtAuthGuard } from './passsport/jwt-auth.guard';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Param,
+  Post,
+  Query,
+  Req,
+  Request,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
+import { Response } from "express";
+import { VerifyEmailDto } from "src/email/dto/verify-email.dto";
+import { Public } from "src/skip-auth.decorator";
+import { CreateUserDto } from "src/users/dto/create-user.dto";
+import { UserEntity } from "src/users/entities/user.entity";
+import { UsersService } from "src/users/users.service";
+import { AuthService } from "./auth.service";
+import { CustomGuard } from "./passsport/custom.guard";
+import { JwtAuthGuard } from "./passsport/jwt-auth.guard";
 
-@Controller('auth')
+@Controller("auth")
 export class AuthController {
-    constructor(private authService: AuthService) { }
+  constructor(
+    private authService: AuthService,
+    private usersService: UsersService
+  ) {}
 
-    // 이름과 패스워드 받아서 로그인
-    // auth 처리가 안되어있기 때문에 에러
-    @UseGuards(AuthGuard('local'))
-    @Post('/login')
-    async login(@Request() req) {
-        return req.user;
-    }
+  @Public()
+  @Post("/create")
+  async create(@Body() createUserDto: CreateUserDto) {
+    return await this.authService.register(createUserDto);
+  }
 
-    // passport-local strategy를 채택하도록 하고, Passport가 validate()메서드를 통해 자동으로 user object를 생성하고 Request object에 이를 할당해준다.
-    // 이름과 패스워드 받아서 로그인
-    // @UseGuards(AuthGuard('local'))
-    // @Post('/alogin')
-    // async alogin(@Request() req){
-    //     return this.authService.login(req);
-    // }
+  // 이메일과 패스워드 받아서 로그인. jwt토큰에 user 정보를 받아서 json으로 리턴.
+  // UseGuards에서 이름을 참조해 passport-local패키지에서 제공하는 코드와 연결
+  // @UseGuards(AuthGuard("local"))
+  @Public()
+  @Post("/login")
+  async login(@Request() req, @Res({ passthrough: true }) res: Response) {
+    //  이메일과 패스워드 받아서 로그인. jwt 토큰 반환
+    const { access_token, ...option } = await this.authService.login(req.body);
+    // jwt 토큰 쿠키에 저장
+    res.cookie("Authentication", access_token, option);
+  }
 
+  @Post("/logout")
+  async logOut(@Res({ passthrough: true }) res: Response) {
+    const { access_token, ...option } = await this.authService.logOut();
+    res.cookie("Authentication", access_token, option);
+  }
 
-    @Get('google')
-    @UseGuards(AuthGuard('google'))
-    async googleAuth(@Req() req) { }
+  @Get("profile")
+  getProfile(@Request() req) {
+    return req.user;
+  }
 
-    @Get('google/callback')
-    @UseGuards(AuthGuard('google'))
-    googleAuthRedirect(@Req() req) {
-        return this.authService.googleLogin(req);
-    }
+  @Get("google")
+  @UseGuards(AuthGuard("google"))
+  async googleAuth(@Req() req) {
+    return;
+  }
 
+  @Get("google/callback")
+  @UseGuards(AuthGuard("google"))
+  googleAuthRedirect(@Req() req) {
+    return this.authService.googleLogin(req);
+  }
 
-    @UseGuards(JwtAuthGuard)
-    @Get('/profile')
-    getProfile(@Request() req) {
-        return req.user;
-    }
+  @UseGuards(CustomGuard)
+  @Get("/custom/login")
+  getHello(): string {
+    return "hi";
+  }
 
-    @UseGuards(CustomGuard)
-    @Get(':custom/login')
-    getHello(): string {
-        return "hi";
-    }
+  // 가입 확인 인증 진행
+  @Post("/email-verify")
+  async verifyEmail(@Query() dto: VerifyEmailDto): Promise<any> {
+    const { signupVerifyToken } = dto;
+    console.log(dto);
+    console.log(signupVerifyToken);
 
+    // jwt토큰을 리턴합니다. 클라이언트는 jwt를 저장한 후 리소스를 요청할때 함께 전달합니다.
+    return await this.authService.verifyEmail(signupVerifyToken);
+  }
+
+  // Bearer Token에 발급받은 JWT Token으로 해당 토큰을 통해 유저의 정보를 확인하고
+  // 유저의 정보를 반환한다.
+  // 이 과정을 Guard를 사용해 JWT Token 인증과정이 여러 엔드포인트에서도 사용될 수 있도록 처리한다.
+  @UseGuards(CustomGuard)
+  @Get("/email")
+  async getUserInfo(@Param("email") email: string): Promise<string> {
+    // const jwtString = headers.authorization.split("Bearer ")[1];
+
+    // this.authService.verify(jwtString);
+
+    return this.usersService.getUserInfo(email);
+  }
 }
