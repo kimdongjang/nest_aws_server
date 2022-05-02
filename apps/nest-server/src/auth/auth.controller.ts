@@ -42,13 +42,15 @@ export class AuthController {
   @Post("/login")
   async login(@Request() req, @Res({ passthrough: true }) res: Response) {
     //  이메일과 패스워드 받아서 로그인. jwt 토큰 반환
-    const token = await this.authService.login(req.body);
+    const { access_token, ...option } = await this.authService.login(req.body);
     // jwt 토큰 쿠키에 저장
-    res.cookie("Authentication", token, {
-      domain: process.env.DOMAIN,
-      path: "/",
-      httpOnly: true,
-    });
+    res.cookie("Authentication", access_token, option);
+  }
+
+  @Post("/logout")
+  async logOut(@Res({ passthrough: true }) res: Response) {
+    const { access_token, ...option } = await this.authService.logOut();
+    res.cookie("Authentication", access_token, option);
   }
 
   @Get("profile")

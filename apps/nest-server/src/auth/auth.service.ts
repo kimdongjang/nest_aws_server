@@ -9,9 +9,9 @@ import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "src/users/users.service";
 import * as jwt from "jsonwebtoken";
 import { UserEntity } from "src/users/entities/user.entity";
-import { jwtConfig } from "../config/jwt.config";
 import { compare, hash } from "bcrypt";
 import { CreateUserDto } from "src/users/dto/create-user.dto";
+import { ConfigService } from "@nestjs/config";
 
 // username과 password를 통해 인증을 진행
 // 한번 인증되었다면 서버는 특정 request에서 인증 상태를 확인하기 위해 jwt를 발급
@@ -20,7 +20,8 @@ import { CreateUserDto } from "src/users/dto/create-user.dto";
 export class AuthService {
   constructor(
     private jwtService: JwtService,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private configService: ConfigService
   ) {}
 
   /**
@@ -40,12 +41,29 @@ export class AuthService {
   // local.stragtegy에서 정의한 email과 password로 validate를 검사하는 과정을 진행함
   async login(user: UserEntity) {
     const payload = await this.usersService.findByEmail(user.email);
-    console.log(payload);
-    const access_token = {
-      access_token: jwt.sign(JSON.stringify(payload), jwtConfig.secret),
+    const token = {
+      access_token: jwt.sign(
+        JSON.stringify(payload),
+        this.configService.get("JWT_ACCESS_TOKEN_SECRET")
+      ),
+      domain: this.configService.get("DOMAIN"),
+      path: "/",
+      httpOnly: true,
+      maxAge:
+        Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")) * 1,
     };
 
-    return access_token;
+    return token;
+  }
+
+  async logOut() {
+    return {
+      access_token: "",
+      domain: this.configService.get("DOMAIN"),
+      path: "/",
+      httpOnly: true,
+      maxAge: 0,
+    };
   }
 
   /**
@@ -147,11 +165,10 @@ export class AuthService {
    */
   verify(jwtString: string) {
     try {
-      const payload = jwt.verify(jwtString, jwtConfig.secret) as (
-        | jwt.JwtPayload
-        | string
-      ) &
-        UserEntity;
+      const payload = jwt.verify(
+        jwtString,
+        this.configService.get("JWT_ACCESS_TOKEN_SECRET")
+      ) as (jwt.JwtPayload | string) & UserEntity;
       console.log(payload);
 
       return payload;
