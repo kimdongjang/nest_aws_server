@@ -1,4 +1,6 @@
 import {
+  HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -20,7 +22,7 @@ export class UsersService {
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,
     private connection: Connection,
-    private emailService: EmailService,
+    private emailService: EmailService
   ) {}
 
   /**
@@ -64,11 +66,11 @@ export class UsersService {
    * @returns
    */
   async create(userData: CreateUserDto): Promise<UserEntity> {
-    const { email, username, password, isactive } = userData;
+    const { email, username, password } = userData;
     const userExist = await this.checkUserExists(email);
     if (!userExist) {
       throw new UnprocessableEntityException(
-        "해당 이메일로는 가입할 수 없습니다.",
+        "해당 이메일로는 가입할 수 없습니다."
       );
     }
     const signupVerifyToken = uuid.v1();
@@ -76,7 +78,7 @@ export class UsersService {
     user.email = email;
     user.password = password;
     user.username = username;
-    user.isactive = isactive;
+    user.isactive = false;
     user.signupVerifyToken = signupVerifyToken;
 
     // user 정보 저장시 트랜지션 적용
@@ -94,13 +96,13 @@ export class UsersService {
       // 가입 확인 메일 전송
       await this.emailService.sendMemberJoinVerification(
         email,
-        signupVerifyToken,
+        signupVerifyToken
       );
     } catch (e) {
       console.log(e);
       await queryRunner.rollbackTransaction();
       throw new UnprocessableEntityException(
-        "해당 이메일로는 가입할 수 없습니다.",
+        "해당 이메일로는 가입할 수 없습니다."
       );
     } finally {
       // 직접 생성한 queryRunner는 해제해주어야 함.
@@ -110,12 +112,13 @@ export class UsersService {
     return user;
   }
 
-  
   async getUserInfo(email: string): Promise<any> {
-    const user = await this.usersRepository.findOne({where:{ email: email }});
+    const user = await this.usersRepository.findOne({
+      where: { email: email },
+    });
 
     if (!user) {
-      throw new NotFoundException('유저가 존재하지 않습니다');
+      throw new NotFoundException("유저가 존재하지 않습니다");
     }
 
     return {
@@ -124,7 +127,6 @@ export class UsersService {
       email: user.email,
     };
   }
-
 
   async findAll() {
     return this.usersRepository.find();
@@ -135,10 +137,17 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<UserEntity | undefined> {
-    return this.usersRepository.findOne({ where: { email: email } });
+    const user = this.usersRepository.findOne({ where: { email: email } });
+    if (user) {
+      return user;
+    }
+    throw new HttpException(
+      "User with this email does not exist",
+      HttpStatus.NOT_FOUND
+    );
   }
   async findByToken(
-    signupVerifyToken: string,
+    signupVerifyToken: string
   ): Promise<UserEntity | undefined> {
     return this.usersRepository.findOne({
       where: { signupVerifyToken: signupVerifyToken },
@@ -147,7 +156,7 @@ export class UsersService {
 
   async findByEmailPw(
     email: string,
-    password: string,
+    password: string
   ): Promise<UserEntity | undefined> {
     return this.usersRepository.findOne({
       where: { email: email, password: password },

@@ -8,21 +8,20 @@ import { AuthService } from "../auth.service";
 // 사용자가 해당 기능을 사용할 수 있는지 판단
 @Injectable()
 export class CustomGuard implements CanActivate {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
   canActivate(
-    context: ExecutionContext,
+    context: ExecutionContext
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
     return this.validateRequest(request);
   }
 
-
-  private validateRequest(request: Request) {    
+  private validateRequest(request: Request) {
     const jwtString = request.headers.authorization.split("Bearer ")[1];
 
     this.authService.verify(jwtString);
-    
+
     return true;
   }
 }

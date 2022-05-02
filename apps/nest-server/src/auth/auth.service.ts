@@ -1,19 +1,17 @@
 import {
-  Inject,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
-  Query,
   UnauthorizedException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "src/users/users.service";
 import * as jwt from "jsonwebtoken";
-import { ConfigType } from "@nestjs/config";
 import { UserEntity } from "src/users/entities/user.entity";
-import { Repository } from "typeorm";
-import { LocalAuthGuard } from "./passsport/local-auth.guard";
 import { jwtConfig } from "../config/jwt.config";
-import { VerifyEmailDto } from "src/email/dto/verify-email.dto";
+import { compare, hash } from "bcrypt";
+import { CreateUserDto } from "src/users/dto/create-user.dto";
 
 // username과 password를 통해 인증을 진행
 // 한번 인증되었다면 서버는 특정 request에서 인증 상태를 확인하기 위해 jwt를 발급
@@ -22,32 +20,107 @@ import { VerifyEmailDto } from "src/email/dto/verify-email.dto";
 export class AuthService {
   constructor(
     private jwtService: JwtService,
-    private usersService: UsersService,
+    private usersService: UsersService
   ) {}
 
-  // local.stragtegy에서 정의한 email과 password로 validate를 검사하는 과정을 진행함
-  async login(email: string, password: string) {
-    // const payload = {username: user.username, sub:user.userid};
-    // return {user, access_token: this.jwtService.sign(payload)};
-    const payload = await this.validateUser(email, password);
-    console.log(payload)
-
-    // access_token: this.jwtService.sign({ payload, jwtConfig.secret),
-
-    return jwt.sign(payload, jwtConfig.secret);
-  }
-
-  // user를 검색하고 패스워드가 맞는지 확인해서 반환함
-  async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.usersService.findByEmail(email);
-
-    if (user && user.password === password) {
-      const { password, ...result } = user;
-      // result는 password 를 제외한 user의 모든 정보를 포함한다.
-      return result;
+  /**
+   * 구글로 로그인했을시의 서비스
+   * @param req
+   * @returns
+   */
+  googleLogin(req) {
+    if (!req.user) {
+      return "No user from google";
     }
-    return null;
+    return {
+      message: "User information from google",
+      user: req.user,
+    };
   }
+  // local.stragtegy에서 정의한 email과 password로 validate를 검사하는 과정을 진행함
+  async login(user: UserEntity) {
+    const payload = await this.usersService.findByEmail(user.email);
+
+    const access_token = {
+      access_token: jwt.sign(JSON.stringify(payload), jwtConfig.secret),
+    };
+    return access_token;
+  }
+
+  /**
+   * user를 검색하고 패스워드가 맞는지 확인해서 반환함
+   * @param email
+   * @param password
+   * @returns
+   */
+  async validateUser(email: string, plainTextPassword: string): Promise<any> {
+    try {
+      const user = await this.usersService.findByEmail(email);
+      await this.verifyPassword(plainTextPassword, user.password);
+
+      const { password, ...result } = user;
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        "Wrong credentials provided",
+        HttpStatus.BAD_REQUEST
+      );
+    }
+  }
+
+  /**
+   * 패스워드 검사
+   * @param plainTextPassword 입력 패스워드
+   * @param hashedPassword DB 패스워드
+   */
+  private async verifyPassword(
+    plainTextPassword: string,
+    hashedPassword: string
+  ) {
+    const isPasswordMatch = await compare(plainTextPassword, hashedPassword);
+    if (!isPasswordMatch) {
+      throw new HttpException(
+        "Wrong credentials provided",
+        HttpStatus.BAD_REQUEST
+      );
+    }
+  }
+
+  /**
+   * 유저 데이터를 생성할때 hash값으로 패스워드를 생성
+   * @param user
+   * @returns
+   */
+  async register(userData: CreateUserDto) {
+    const hashedPassword = await hash(userData.password, 10);
+    try {
+      const { password, ...returnUser } = await this.usersService.create({
+        ...userData,
+        password: hashedPassword,
+      });
+      return returnUser;
+    } catch (error) {
+      if (error?.code === "ER_DUP_ENTRY") {
+        throw new HttpException(
+          "User with that email already exits",
+          HttpStatus.BAD_REQUEST
+        );
+      }
+    }
+  }
+
+  // private async verifyPassword(
+  //   plainTextPassword: string,
+  //   hashedPassword: string,
+  // ) {
+  //   const isPasswordMatch = await compare(plainTextPassword, hashedPassword);
+  //   if (!isPasswordMatch) {
+  //     throw new HttpException(
+  //       'Wrong credentials provided',
+  //       HttpStatus.BAD_REQUEST,
+  //     );
+  //   }
+  // }
 
   /**
    * 토큰으로 이메일 검사
@@ -62,9 +135,8 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException("유저가 존재하지 않습니다");
     }
-
     // 2. 바로 로그인 상태가 되도록 JWT를 발급
-    return this.login(user.email, user.password);
+    return this.login(user);
   }
 
   /**
@@ -79,22 +151,11 @@ export class AuthService {
         | string
       ) &
         UserEntity;
-        console.log(payload)
+      console.log(payload);
 
       return payload;
-
     } catch (e) {
       throw new UnauthorizedException();
     }
-  }
-
-  googleLogin(req) {
-    if (!req.user) {
-      return "No user from google";
-    }
-    return {
-      message: "User information from google",
-      user: req.user,
-    };
   }
 }
