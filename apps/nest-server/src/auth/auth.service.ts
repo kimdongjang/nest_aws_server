@@ -40,10 +40,11 @@ export class AuthService {
   // local.stragtegy에서 정의한 email과 password로 validate를 검사하는 과정을 진행함
   async login(user: UserEntity) {
     const payload = await this.usersService.findByEmail(user.email);
-
+    console.log(payload);
     const access_token = {
       access_token: jwt.sign(JSON.stringify(payload), jwtConfig.secret),
     };
+
     return access_token;
   }
 

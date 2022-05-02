@@ -9,13 +9,14 @@ import { JwtModule } from "@nestjs/jwt";
 import { AuthService } from "./auth/auth.service";
 import { JwtAuthGuard } from "./auth/passsport/jwt-auth.guard";
 import { APP_GUARD } from "@nestjs/core";
-import { DatabaseModule } from "./database/database.module";
 import { LoggerMiddleware } from "./logger.middleware";
 import { join } from "path";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Connection } from "typeorm";
 import { UsersModule } from "./users/users.module";
+import { DatabaseModule } from "./database/database.module";
 import emailConfig from "./config/email.config";
+import Joi from "@hapi/joi";
 
 // providers: nest injector에 의해 인스턴스화되고 모듈에서 공유되는 provider
 // controller: 인스턴스화해야하는 컨트롤러 세트
@@ -31,16 +32,13 @@ import emailConfig from "./config/email.config";
         process.env.NODE_ENV === "production"
           ? ".production.env"
           : ".development.env",
-    }),
-    TypeOrmModule.forRoot({
-      type: "mysql",
-      host: process.env.DATABASE_HOST,
-      port: 3306,
-      username: process.env.DATABASE_USERNAME,
-      password: process.env.DATABASE_PASSWORD,
-      database: "maindatabase",
-      entities: [__dirname + "/**/*.entity{.ts,.js}"],
-      synchronize: Boolean(process.env.DATABASE_SYNCHRONIZE), // true,
+      validationSchema: Joi.object({
+        DATABASE_HOST: Joi.string().required(),
+        DATABASE_PORT: Joi.number().required(),
+        DATABASE_USERNAME: Joi.string().required(),
+        DATABASE_PASSWORD: Joi.string().required(),
+        DATABASE_NAME: Joi.string().required(),
+      }),
     }),
     MailerModule.forRootAsync({
       imports: [ConfigModule],
@@ -62,8 +60,8 @@ import emailConfig from "./config/email.config";
       },
     }),
     AuthModule,
-    DatabaseModule,
     UsersModule,
+    DatabaseModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
 })
