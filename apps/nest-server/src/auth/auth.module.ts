@@ -4,16 +4,17 @@ import { AuthService } from "./auth.service";
 import { AuthController } from "./auth.controller";
 import { JwtModule } from "@nestjs/jwt";
 import { APP_GUARD } from "@nestjs/core";
-import { JwtAuthGuard } from "./passsport/jwt-auth.guard";
-import { GoogleStrategy } from "./passsport/google.strategy";
-import { JwtStrategy } from "./passsport/jwt.strategy";
+import { JwtAuthGuard } from "./guards/jwt-auth.guard";
+import { GoogleStrategy } from "./strategies/google.strategy";
+import { JwtStrategy } from "./strategies/jwt.strategy";
 import { UsersModule } from "src/users/users.module";
 import { UsersService } from "src/users/users.service";
 import { Repository } from "typeorm";
 import { UserEntity } from "src/users/entities/user.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { LocalStrategy } from "./passsport/local.strategy";
+import { LocalStrategy } from "./strategies/local.strategy";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { JwtRefreshStrategy } from "./strategies/jwt-refresh.strategy";
 
 @Module({
   imports: [
@@ -31,8 +32,15 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
       }),
     }),
     UsersModule,
+    ConfigModule,
   ],
-  providers: [AuthService, JwtStrategy, GoogleStrategy, LocalStrategy],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    GoogleStrategy,
+    LocalStrategy,
+    JwtRefreshStrategy,
+  ],
   exports: [AuthService, JwtModule],
   controllers: [AuthController],
 })

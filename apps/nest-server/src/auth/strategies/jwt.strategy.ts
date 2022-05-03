@@ -11,7 +11,7 @@ import { Strategy } from "passport-jwt";
 import { UsersService } from "src/users/users.service";
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
   constructor(
     private readonly configService: ConfigService,
     private readonly usersService: UsersService
@@ -24,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromExtractors([
         request => {
           try {
-            return request?.cookies?.Authentication.access_token;
+            return request?.cookies?.Authentication;
           } catch (error) {
             throw new HttpException(
               "Not Found your email",
@@ -33,8 +33,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
           }
         },
       ]),
-      // false라면 jwt가 만료되었는지 확인하고, 만료되었다면 401에러 발생
-      ignoreExpiration: false,
+      // ignoreExpiration: false라면 jwt가 만료되었는지 확인하고, 만료되었다면 401에러 발생
+      //ignoreExpiration: false,
       secretOrKey: configService.get("JWT_ACCESS_TOKEN_SECRET"),
     });
   }
