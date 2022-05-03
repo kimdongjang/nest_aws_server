@@ -14,6 +14,7 @@ import { UserEntity } from "./entities/user.entity";
 import * as uuid from "uuid";
 import { EmailService } from "src/email/email.service";
 import { AuthService } from "src/auth/auth.service";
+import { compare, hash } from "bcrypt";
 
 @Injectable()
 export class UsersService {
@@ -39,26 +40,6 @@ export class UsersService {
     });
     return val;
   }
-
-  // /**
-  //  * 토큰으로 이메일 검사
-  //  * @param signupVerifyToken
-  //  * @returns
-  //  */
-  // async verifyEmail(signupVerifyToken: string) {
-  //   // 1. DB에서 signupVerifyToken으로 회원 가입 처리중인 유저가 있는지 조회하고 없다면 에러 처리
-  //   const user = await this.findByToken(signupVerifyToken);
-  //   console.log(user)
-
-  //   if (!user) {
-  //       throw new NotFoundException('유저가 존재하지 않습니다');
-  //   }
-
-  //   // 2. 바로 로그인 상태가 되도록 JWT를 발급
-  //   return this.authService.login(
-  //       user.email, user.password,
-  //   );
-  // }
 
   /**
    * 유저 데이터 생성
@@ -112,20 +93,48 @@ export class UsersService {
     return user;
   }
 
-  async getUserInfo(email: string): Promise<any> {
-    const user = await this.usersRepository.findOne({
-      where: { email: email },
-    });
+  /**
+   * 리프레시 토큰을 해쉬함수로 변환해서 DB에 업데이트
+   * @param refreshToken
+   * @param id
+   */
+  async setCurrentRefreshToken(refreshToken: string, email: string) {
+    const currentHashedRefreshToken = await hash(refreshToken, 10);
+    console.log(currentHashedRefreshToken);
+    await this.usersRepository.update(
+      { email: email },
+      {
+        currentHashedRefreshToken: currentHashedRefreshToken,
+      }
+    );
+  }
 
-    if (!user) {
-      throw new NotFoundException("유저가 존재하지 않습니다");
+  async getUserIfRefreshTokenMatches(refreshToken: string, email: string) {
+    const user = await this.findByEmail(email);
+    console.log(user);
+
+    const isRefreshTokenMatching = await compare(
+      refreshToken,
+      user.currentHashedRefreshToken
+    );
+
+    if (isRefreshTokenMatching) {
+      return user;
     }
+  }
 
-    return {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-    };
+  /**
+   *
+   * @param id
+   * @returns
+   */
+  async removeRefreshToken(email: string) {
+    return this.usersRepository.update(
+      { email: email },
+      {
+        currentHashedRefreshToken: null,
+      }
+    );
   }
 
   async findAll() {

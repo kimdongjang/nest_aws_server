@@ -11,6 +11,6 @@
       }
     }
   ],
-  "prettier/prettier": ["error", {"singleQuote": true,"parser": "@babel/eslint-parser"}]
+  "prettier/prettier": ["error", {"singleQuote": false,"parser": "@babel/eslint-parser"}]
 
 }

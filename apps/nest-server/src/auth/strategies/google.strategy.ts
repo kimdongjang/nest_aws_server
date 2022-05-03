@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { config } from "dotenv";
 import { Strategy, VerifyCallback } from "passport-google-oauth20";
+import process from "process";
 
 config();
 

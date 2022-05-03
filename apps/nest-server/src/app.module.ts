@@ -7,7 +7,7 @@ import { AuthModule } from "./auth/auth.module";
 import { PassportModule } from "@nestjs/passport";
 import { JwtModule } from "@nestjs/jwt";
 import { AuthService } from "./auth/auth.service";
-import { JwtAuthGuard } from "./auth/passsport/jwt-auth.guard";
+import { JwtAuthGuard } from "./auth/guards/jwt-auth.guard";
 import { APP_GUARD } from "@nestjs/core";
 import { LoggerMiddleware } from "./logger.middleware";
 import { join } from "path";
@@ -41,15 +41,17 @@ import Joi from "@hapi/joi";
 
         JWT_ACCESS_TOKEN_SECRET: Joi.string().required(),
         JWT_ACCESS_TOKEN_EXPIRATION_TIME: Joi.string().required(),
+        JWT_REFRESH_TOKEN_SECRET: Joi.string().required(),
+        JWT_REFRESH_TOKEN_EXPIRATION_TIME: Joi.string().required(),
       }),
     }),
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        console.log("===== write [.env] by config: network====");
-        console.log(config.get("email"));
-        console.log(__dirname);
+        // console.log("===== write [.env] by config: network====");
+        // console.log(config.get("email"));
+        // console.log(__dirname);
         return {
           ...config.get("email"),
           template: {

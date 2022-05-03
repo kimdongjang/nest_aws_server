@@ -12,6 +12,7 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
+import { ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
 import { VerifyEmailDto } from "src/email/dto/verify-email.dto";
 import { Public } from "src/skip-auth.decorator";
@@ -20,8 +21,10 @@ import { UserEntity } from "src/users/entities/user.entity";
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";
 import { CustomGuard } from "./passsport/custom.guard";
-import { JwtAuthGuard } from "./passsport/jwt-auth.guard";
+import { JwtAuthGuard } from "./guards/jwt-auth.guard";
+import { JwtRefreshGuard } from "./guards/jwt-refresh.guard";
 
+@ApiTags("AuthApi")
 @Controller("auth")
 export class AuthController {
   constructor(
@@ -41,16 +44,56 @@ export class AuthController {
   @Public()
   @Post("/login")
   async login(@Request() req, @Res({ passthrough: true }) res: Response) {
-    //  이메일과 패스워드 받아서 로그인. jwt 토큰 반환
-    const { access_token, ...option } = await this.authService.login(req.body);
-    // jwt 토큰 쿠키에 저장
-    res.cookie("Authentication", access_token, option);
+    const user = req.body;
+
+    // user 이메일을 통해 user 데이터를 조회후 jwt토큰으로 변경
+    const { accessToken, ...accessOption } =
+      await this.authService.getCookieWithJwtAccessToken(user.email);
+
+    const { refreshToken, ...refreshOption } =
+      await this.authService.getCookieWithJwtRefreshToken(user.email);
+
+    await this.usersService.setCurrentRefreshToken(refreshToken, user.email);
+
+    // 쿠키에 jwt토큰과 refresh 토큰을 저장
+    res.cookie("Authentication", accessToken, accessOption);
+    res.cookie("Refresh", refreshToken, refreshOption);
+
+    return user;
+
+    // //  이메일과 패스워드 받아서 로그인. jwt 토큰 반환
+    // const { access_token, ...option } = await this.authService.login(req.body);
+    // console.log(access_token);
+    // console.log(option);
+    // // jwt 토큰 쿠키에 저장
+    // res.cookie("Authentication", access_token, option);
   }
 
+  @UseGuards(JwtRefreshGuard)
   @Post("/logout")
-  async logOut(@Res({ passthrough: true }) res: Response) {
-    const { access_token, ...option } = await this.authService.logOut();
-    res.cookie("Authentication", access_token, option);
+  async logOut(@Req() req, @Res({ passthrough: true }) res: Response) {
+    // const { access_token, ...option } = await this.authService.logOut();
+    // res.cookie("Authentication", access_token, option);
+    const { accessOption, refreshOption } =
+      this.authService.getCookiesForLogOut();
+
+    await this.usersService.removeRefreshToken(req.body.email);
+
+    res.cookie("Authentication", "", accessOption);
+    res.cookie("Refresh", "", refreshOption);
+
+    return 1;
+  }
+
+  @UseGuards(JwtRefreshGuard)
+  @Get("refresh")
+  async refresh(@Req() req, @Res({ passthrough: true }) res: Response) {
+    const user = req.body;
+    console.log(user);
+    const { accessToken, ...accessOption } =
+      await this.authService.getCookieWithJwtAccessToken(user.email);
+    res.cookie("Authentication", accessToken, accessOption);
+    return user;
   }
 
   @Get("profile")
@@ -80,8 +123,6 @@ export class AuthController {
   @Post("/email-verify")
   async verifyEmail(@Query() dto: VerifyEmailDto): Promise<any> {
     const { signupVerifyToken } = dto;
-    console.log(dto);
-    console.log(signupVerifyToken);
 
     // jwt토큰을 리턴합니다. 클라이언트는 jwt를 저장한 후 리소스를 요청할때 함께 전달합니다.
     return await this.authService.verifyEmail(signupVerifyToken);
@@ -92,11 +133,11 @@ export class AuthController {
   // 이 과정을 Guard를 사용해 JWT Token 인증과정이 여러 엔드포인트에서도 사용될 수 있도록 처리한다.
   @UseGuards(CustomGuard)
   @Get("/email")
-  async getUserInfo(@Param("email") email: string): Promise<string> {
+  async getUserInfo(@Param("email") email: string): Promise<UserEntity> {
     // const jwtString = headers.authorization.split("Bearer ")[1];
 
     // this.authService.verify(jwtString);
 
-    return this.usersService.getUserInfo(email);
+    return this.usersService.findByEmail(email);
   }
 }
