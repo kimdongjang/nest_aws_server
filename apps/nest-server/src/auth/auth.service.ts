@@ -31,7 +31,10 @@ export class AuthService {
    */
   googleLogin(req) {
     if (!req.user) {
-      return "No user from google";
+      return {
+        message: "No user from google",
+        user: null,
+      };
     }
     return {
       message: "User information from google",
@@ -81,9 +84,9 @@ export class AuthService {
   async validateUser(email: string, plainTextPassword: string): Promise<any> {
     try {
       const user = await this.usersService.findByEmail(email);
-      await this.verifyPassword(plainTextPassword, user.password);
+      await this.verifyPassword(plainTextPassword, user.localAuth.password);
 
-      const { password, ...result } = user;
+      const { ...result } = user;
       return result;
     } catch (error) {
       throw new HttpException(
@@ -119,7 +122,7 @@ export class AuthService {
   async register(userData: CreateUserDto) {
     const hashedPassword = await hash(userData.password, 10);
     try {
-      const { password, ...returnUser } = await this.usersService.create({
+      const { ...returnUser } = await this.usersService.create({
         ...userData,
         password: hashedPassword,
       });

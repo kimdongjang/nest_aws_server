@@ -15,6 +15,8 @@ import * as uuid from "uuid";
 import { EmailService } from "src/email/email.service";
 import { AuthService } from "src/auth/auth.service";
 import { compare, hash } from "bcrypt";
+import { LocalAuthenticaionEntity } from "./entities/localAuthenticaion.entity";
+import { SocialAuthenticationEntity } from "./entities/socialAuthentication.entity";
 
 @Injectable()
 export class UsersService {
@@ -22,6 +24,10 @@ export class UsersService {
     // repository 사용을 위해 @InjectRepository로 Service와 User와 의존관계를 주입한다.
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,
+    @InjectRepository(LocalAuthenticaionEntity)
+    private localAuthRepository: Repository<LocalAuthenticaionEntity>,
+    @InjectRepository(SocialAuthenticationEntity)
+    private socialAuthRepository: Repository<SocialAuthenticationEntity>,
     private connection: Connection,
     private emailService: EmailService
   ) {}
@@ -57,10 +63,14 @@ export class UsersService {
     const signupVerifyToken = uuid.v1();
     const user = new UserEntity();
     user.email = email;
-    user.password = password;
     user.username = username;
     user.isactive = false;
     user.signupVerifyToken = signupVerifyToken;
+
+    const localAuth = new LocalAuthenticaionEntity();
+    localAuth.email = user.email;
+    localAuth.password = password;
+    localAuth.user = user;
 
     // user 정보 저장시 트랜지션 적용
     const queryRunner = this.connection.createQueryRunner();
@@ -71,6 +81,7 @@ export class UsersService {
 
       // 트랜잭션으로 유저 정보 저장
       await queryRunner.manager.save(user);
+      await queryRunner.manager.save(localAuth);
 
       await queryRunner.commitTransaction();
 
@@ -163,14 +174,14 @@ export class UsersService {
     });
   }
 
-  async findByEmailPw(
-    email: string,
-    password: string
-  ): Promise<UserEntity | undefined> {
-    return this.usersRepository.findOne({
-      where: { email: email, password: password },
-    });
-  }
+  // async findByEmailPw(
+  //   email: string,
+  //   password: string
+  // ): Promise<UserEntity | undefined> {
+  //   return this.usersRepository.findOne({
+  //     where: { email: email, password: password },
+  //   });
+  // }
 
   update(username: string, updateUserDto: UpdateUserDto) {
     return `This action updates a #${username} user`;

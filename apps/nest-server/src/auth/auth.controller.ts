@@ -101,16 +101,21 @@ export class AuthController {
     return req.user;
   }
 
+  @Public()
   @Get("google")
   @UseGuards(AuthGuard("google"))
   async googleAuth(@Req() req) {
     return;
   }
 
+  @Public()
   @Get("google/callback")
   @UseGuards(AuthGuard("google"))
   googleAuthRedirect(@Req() req) {
-    return this.authService.googleLogin(req);
+    console.log(req);
+    const res = this.authService.googleLogin(req);
+    // console.log(res);
+    return res;
   }
 
   @UseGuards(CustomGuard)
