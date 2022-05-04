@@ -10,7 +10,6 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
 import { UsersModule } from "src/users/users.module";
 import { UsersService } from "src/users/users.service";
 import { Repository } from "typeorm";
-import { UserEntity } from "src/users/entities/user.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { LocalStrategy } from "./strategies/local.strategy";
 import { ConfigModule, ConfigService } from "@nestjs/config";

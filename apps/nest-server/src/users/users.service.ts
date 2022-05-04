@@ -10,24 +10,24 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Connection, Repository } from "typeorm";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { UserEntity } from "./entities/user.entity";
 import * as uuid from "uuid";
 import { EmailService } from "src/email/email.service";
 import { AuthService } from "src/auth/auth.service";
 import { compare, hash } from "bcrypt";
-import { LocalAuthenticaionEntity } from "./entities/localAuthenticaion.entity";
-import { SocialAuthenticationEntity } from "./entities/socialAuthentication.entity";
+import { User } from "src/database/entities/User.entity";
+import { LocalAuthenticaion } from "src/database/entities/LocalAuthenticaion.entity";
+import { SocialAuthentication } from "src/database/entities/SocialAuthentication.entity";
 
 @Injectable()
 export class UsersService {
   constructor(
     // repository 사용을 위해 @InjectRepository로 Service와 User와 의존관계를 주입한다.
-    @InjectRepository(UserEntity)
-    private usersRepository: Repository<UserEntity>,
-    @InjectRepository(LocalAuthenticaionEntity)
-    private localAuthRepository: Repository<LocalAuthenticaionEntity>,
-    @InjectRepository(SocialAuthenticationEntity)
-    private socialAuthRepository: Repository<SocialAuthenticationEntity>,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+    @InjectRepository(LocalAuthenticaion)
+    private localAuthRepository: Repository<LocalAuthenticaion>,
+    @InjectRepository(SocialAuthentication)
+    private socialAuthRepository: Repository<SocialAuthentication>,
     private connection: Connection,
     private emailService: EmailService
   ) {}
@@ -52,7 +52,7 @@ export class UsersService {
    * @param userData
    * @returns
    */
-  async create(userData: CreateUserDto): Promise<UserEntity> {
+  async create(userData: CreateUserDto): Promise<User> {
     const { email, username, password } = userData;
     const userExist = await this.checkUserExists(email);
     if (!userExist) {
@@ -61,16 +61,15 @@ export class UsersService {
       );
     }
     const signupVerifyToken = uuid.v1();
-    const user = new UserEntity();
+    const user = new User();
     user.email = email;
     user.username = username;
     user.isactive = false;
     user.signupVerifyToken = signupVerifyToken;
 
-    const localAuth = new LocalAuthenticaionEntity();
+    const localAuth = new LocalAuthenticaion();
     localAuth.email = user.email;
     localAuth.password = password;
-    localAuth.user = user;
 
     // user 정보 저장시 트랜지션 적용
     const queryRunner = this.connection.createQueryRunner();
@@ -152,11 +151,11 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  async findByName(username: string): Promise<UserEntity | undefined> {
+  async findByName(username: string): Promise<User | undefined> {
     return this.usersRepository.findOne({ where: { username } });
   }
 
-  async findByEmail(email: string): Promise<UserEntity | undefined> {
+  async findByEmail(email: string): Promise<User | undefined> {
     const user = this.usersRepository.findOne({ where: { email: email } });
     if (user) {
       return user;
@@ -166,9 +165,7 @@ export class UsersService {
       HttpStatus.NOT_FOUND
     );
   }
-  async findByToken(
-    signupVerifyToken: string
-  ): Promise<UserEntity | undefined> {
+  async findByToken(signupVerifyToken: string): Promise<User | undefined> {
     return this.usersRepository.findOne({
       where: { signupVerifyToken: signupVerifyToken },
     });
