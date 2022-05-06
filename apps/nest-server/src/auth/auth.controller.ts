@@ -17,12 +17,12 @@ import { Response } from "express";
 import { VerifyEmailDto } from "src/email/dto/verify-email.dto";
 import { Public } from "src/skip-auth.decorator";
 import { CreateUserDto } from "src/users/dto/create-user.dto";
-import { UserEntity } from "src/users/entities/user.entity";
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";
 import { CustomGuard } from "./passsport/custom.guard";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { JwtRefreshGuard } from "./guards/jwt-refresh.guard";
+import { User } from "src/database/entities/User.entity";
 
 @ApiTags("AuthApi")
 @Controller("auth")
@@ -101,16 +101,21 @@ export class AuthController {
     return req.user;
   }
 
+  @Public()
   @Get("google")
   @UseGuards(AuthGuard("google"))
   async googleAuth(@Req() req) {
     return;
   }
 
+  @Public()
   @Get("google/callback")
   @UseGuards(AuthGuard("google"))
   googleAuthRedirect(@Req() req) {
-    return this.authService.googleLogin(req);
+    console.log(req);
+    const res = this.authService.googleLogin(req);
+    // console.log(res);
+    return res;
   }
 
   @UseGuards(CustomGuard)
@@ -133,7 +138,7 @@ export class AuthController {
   // 이 과정을 Guard를 사용해 JWT Token 인증과정이 여러 엔드포인트에서도 사용될 수 있도록 처리한다.
   @UseGuards(CustomGuard)
   @Get("/email")
-  async getUserInfo(@Param("email") email: string): Promise<UserEntity> {
+  async getUserInfo(@Param("email") email: string): Promise<User> {
     // const jwtString = headers.authorization.split("Bearer ")[1];
 
     // this.authService.verify(jwtString);

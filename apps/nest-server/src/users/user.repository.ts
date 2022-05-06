@@ -1,18 +1,16 @@
+import { User } from "src/database/entities/User.entity";
 import { AbstractRepository, EntityRepository } from "typeorm";
-import { UserEntity } from "./entities/user.entity";
 
-@EntityRepository(UserEntity)
-export class UserRepository extends AbstractRepository<UserEntity> {
+@EntityRepository(User)
+export class UserRepository extends AbstractRepository<User> {
+  public async findOneByEmail(email: string) {
+    const qb = this.repository
+      .createQueryBuilder("User")
+      .leftJoinAndSelect("User.userAuth", "userAuth")
+      .leftJoinAndSelect("User.userProfile", "userProfile");
 
-    public async findOneByEmail(email: string) {
-        const qb = this.repository
-          .createQueryBuilder('User')
-          .leftJoinAndSelect('User.userAuth', 'userAuth')
-          .leftJoinAndSelect('User.userProfile', 'userProfile')
-    
-        qb.andWhere('User.email = :email', { email })
-    
-        return qb.getOne()
-      }
-    
+    qb.andWhere("User.email = :email", { email });
+
+    return qb.getOne();
+  }
 }

@@ -8,10 +8,10 @@ import {
 import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "src/users/users.service";
 import * as jwt from "jsonwebtoken";
-import { UserEntity } from "src/users/entities/user.entity";
 import { compare, hash } from "bcrypt";
 import { CreateUserDto } from "src/users/dto/create-user.dto";
 import { ConfigService } from "@nestjs/config";
+import { User } from "src/database/entities/User.entity";
 
 // username과 password를 통해 인증을 진행
 // 한번 인증되었다면 서버는 특정 request에서 인증 상태를 확인하기 위해 jwt를 발급
@@ -31,7 +31,10 @@ export class AuthService {
    */
   googleLogin(req) {
     if (!req.user) {
-      return "No user from google";
+      return {
+        message: "No user from google",
+        user: null,
+      };
     }
     return {
       message: "User information from google",
@@ -40,7 +43,7 @@ export class AuthService {
   }
 
   // local.stragtegy에서 정의한 email과 password로 validate를 검사하는 과정을 진행함
-  async login(user: UserEntity) {
+  async login(user: User) {
     const payload = await this.usersService.findByEmail(user.email);
     const token = {
       access_token: jwt.sign(
@@ -81,9 +84,9 @@ export class AuthService {
   async validateUser(email: string, plainTextPassword: string): Promise<any> {
     try {
       const user = await this.usersService.findByEmail(email);
-      await this.verifyPassword(plainTextPassword, user.password);
+      await this.verifyPassword(plainTextPassword, " user.localAuth.password");
 
-      const { password, ...result } = user;
+      const { ...result } = user;
       return result;
     } catch (error) {
       throw new HttpException(
@@ -119,7 +122,7 @@ export class AuthService {
   async register(userData: CreateUserDto) {
     const hashedPassword = await hash(userData.password, 10);
     try {
-      const { password, ...returnUser } = await this.usersService.create({
+      const { ...returnUser } = await this.usersService.create({
         ...userData,
         password: hashedPassword,
       });
@@ -160,7 +163,7 @@ export class AuthService {
       const payload = jwt.verify(
         jwtString,
         this.configService.get("JWT_ACCESS_TOKEN_SECRET")
-      ) as (jwt.JwtPayload | string) & UserEntity;
+      ) as (jwt.JwtPayload | string) & User;
 
       return payload;
     } catch (e) {
