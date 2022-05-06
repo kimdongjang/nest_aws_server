@@ -22,20 +22,20 @@ services:
       - corp
     restart: on-failure
 
-  nextjs:
-    build:
-      context: ./apps/next-client
-      dockerfile: ./Dockerfile
-      args:      
-        NODE_ENV: "development"
-        BUILD_FLAG: ""
+  #nextjs:
+  #  build:
+  #    context: ./apps/next-client
+  #    dockerfile: ./Dockerfile
+  #    args:      
+  #      NODE_ENV: "development"
+  #      BUILD_FLAG: ""
 
-  nginx:
-    build: 
-      context: ./apps/next-client/nginx
-      dockerfile: ./Dockerfile
-    ports:
-      - 80:80
+  #nginx:
+  #  build: 
+  #    context: ./apps/next-client/nginx
+  #    dockerfile: ./Dockerfile
+  #  ports:
+  #    - 80:80
 
   # react-client:
   #   container_name: react-client
