@@ -17,6 +17,7 @@ import { UsersModule } from "./users/users.module";
 import { DatabaseModule } from "./database/database.module";
 import emailConfig from "./config/email.config";
 import Joi from "@hapi/joi";
+import { EventsModule } from "./event/events.module";
 
 // providers: nest injector에 의해 인스턴스화되고 모듈에서 공유되는 provider
 // controller: 인스턴스화해야하는 컨트롤러 세트
@@ -67,11 +68,12 @@ import Joi from "@hapi/joi";
     AuthModule,
     UsersModule,
     DatabaseModule,
+    EventsModule
   ],
   providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
 })
 export class AppModule implements NestModule {
-  constructor(private connection: Connection) {}
+  constructor(private connection: Connection) { }
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes("/users");
   }

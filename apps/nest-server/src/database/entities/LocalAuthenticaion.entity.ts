@@ -11,7 +11,7 @@ import { User } from "./User.entity";
 @Entity()
 export class LocalAuthenticaion {
   @OneToOne(() => User)
-  @PrimaryColumn()
+  @PrimaryColumn("varchar", { primary: true, name: "email", length: 255, unique: true })
   email: string;
 
   @Column()

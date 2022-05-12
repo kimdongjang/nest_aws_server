@@ -13,7 +13,7 @@ import { SocialAuthentication } from "./SocialAuthentication.entity";
 
 @Entity()
 export class User {
-  @PrimaryColumn({ type: "varchar", length: 200, unique: true })
+  @PrimaryColumn({ primary: true, type: "varchar", length: 200, unique: true })
   email: string;
   @Column()
   username: string;
