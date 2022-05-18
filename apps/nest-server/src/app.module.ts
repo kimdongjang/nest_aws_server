@@ -68,7 +68,7 @@ import { EventsModule } from "./event/events.module";
     AuthModule,
     UsersModule,
     DatabaseModule,
-    EventsModule
+    EventsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
 })
