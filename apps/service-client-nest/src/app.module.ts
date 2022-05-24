@@ -5,8 +5,18 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 
 @Module({
-  imports: [ConfigModule.forRoot()],
+  /**
+   * 아래를 import함으로 ConfigService 애플리케이션을 모듈 전체에서 활용할 수 있게 됨.
+   */
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: '.dev.env',
+    }),
+  ],
   controllers: [AppController],
+  /**
+   * 다른 마이크로 서비스를 호출할 수 있는 서비스를 생성하기 위해 provider에 ClientProxyFactory를 등록함.
+   */
   providers: [
     {
       provide: 'HELLO_SERVICE',
@@ -22,4 +32,4 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}
