@@ -10,10 +10,7 @@ import { LocalAuthenticaion } from "src/database/entities/LocalAuthenticaion.ent
 import { SocialAuthentication } from "src/database/entities/SocialAuthentication.entity";
 
 @Module({
-  imports: [
-    EmailModule,
-    TypeOrmModule.forFeature([User, LocalAuthenticaion, SocialAuthentication]),
-  ],
+  imports: [EmailModule, TypeOrmModule.forFeature([User, LocalAuthenticaion, SocialAuthentication])],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService],

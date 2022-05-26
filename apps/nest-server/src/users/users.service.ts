@@ -1,11 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-  UnprocessableEntityException,
-} from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException, UnprocessableEntityException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Connection, Repository } from "typeorm";
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -54,18 +47,17 @@ export class UsersService {
    * @param userData
    * @returns
    */
-  async create(userData: CreateUserDto): Promise<User> {
+  async createUser(userData: CreateUserDto): Promise<User> {
     const { email, username, password } = userData;
 
     const userExist = await this.checkUserExists(email);
     console.log("userExist " + userExist);
 
     if (!userExist) {
-      throw new UnprocessableEntityException(
-        "해당 이메일로는 가입할 수 없습니다."
-      );
+      throw new UnprocessableEntityException("해당 이메일로는 가입할 수 없습니다.");
     }
     const signupVerifyToken = uuid.v1();
+
     const user = new User();
     user.email = email;
     user.username = username;
@@ -91,16 +83,11 @@ export class UsersService {
       await queryRunner.commitTransaction();
 
       // 가입 확인 메일 전송
-      await this.emailService.sendMemberJoinVerification(
-        email,
-        signupVerifyToken
-      );
+      await this.emailService.sendMemberJoinVerification(email, signupVerifyToken);
     } catch (e) {
       console.log(e);
       await queryRunner.rollbackTransaction();
-      throw new UnprocessableEntityException(
-        "해당 이메일로는 가입할 수 없습니다."
-      );
+      throw new UnprocessableEntityException("해당 이메일로는 가입할 수 없습니다.");
     } finally {
       // 직접 생성한 queryRunner는 해제해주어야 함.
       await queryRunner.release();
@@ -131,14 +118,17 @@ export class UsersService {
     );
   }
 
+  /**
+   * 리프레쉬 토큰이 일치하는지 확인
+   * @param refreshToken
+   * @param email
+   * @returns
+   */
   async getUserIfRefreshTokenMatches(refreshToken: string, email: string) {
     const user = await this.findByEmail(email);
     console.log(user);
 
-    const isRefreshTokenMatching = await compare(
-      refreshToken,
-      user.currentHashedRefreshToken
-    );
+    const isRefreshTokenMatching = await compare(refreshToken, user.currentHashedRefreshToken);
 
     if (isRefreshTokenMatching) {
       return user;
@@ -172,25 +162,13 @@ export class UsersService {
     if (user) {
       return user;
     }
-    throw new HttpException(
-      "User with this email does not exist",
-      HttpStatus.NOT_FOUND
-    );
+    throw new HttpException("User with this email does not exist", HttpStatus.NOT_FOUND);
   }
   async findByToken(signupVerifyToken: string): Promise<User | undefined> {
     return this.usersRepository.findOne({
       where: { signupVerifyToken: signupVerifyToken },
     });
   }
-
-  // async findByEmailPw(
-  //   email: string,
-  //   password: string
-  // ): Promise<UserEntity | undefined> {
-  //   return this.usersRepository.findOne({
-  //     where: { email: email, password: password },
-  //   });
-  // }
 
   update(username: string, updateUserDto: UpdateUserDto) {
     return `This action updates a #${username} user`;

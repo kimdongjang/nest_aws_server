@@ -1,11 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-  UnprocessableEntityException,
-} from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "src/users/users.service";
 import * as jwt from "jsonwebtoken";
@@ -19,11 +12,7 @@ import { User } from "src/database/entities/User.entity";
 // 유효한 jwt를 가지고 있는 request만 접근할 수 있는 protected routes를 생성
 @Injectable()
 export class AuthService {
-  constructor(
-    private jwtService: JwtService,
-    private usersService: UsersService,
-    private configService: ConfigService
-  ) {}
+  constructor(private jwtService: JwtService, private usersService: UsersService, private configService: ConfigService) {}
 
   /**
    * 구글로 로그인했을시의 서비스
@@ -47,16 +36,11 @@ export class AuthService {
   async login(user: User) {
     const payload = await this.usersService.findByEmail(user.email);
     const token = {
-      access_token: jwt.sign(
-        JSON.stringify(payload),
-        this.configService.get("JWT_ACCESS_TOKEN_SECRET")
-      ),
+      access_token: jwt.sign(JSON.stringify(payload), this.configService.get("JWT_ACCESS_TOKEN_SECRET")),
       domain: this.configService.get("DOMAIN"),
       path: "/",
       httpOnly: true,
-      maxAge:
-        Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")) *
-        1000,
+      maxAge: Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")) * 1000,
     };
 
     return token;
@@ -90,10 +74,7 @@ export class AuthService {
       const { ...result } = user;
       return result;
     } catch (error) {
-      throw new HttpException(
-        "Wrong credentials provided",
-        HttpStatus.BAD_REQUEST
-      );
+      throw new HttpException("Wrong credentials provided", HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -102,16 +83,10 @@ export class AuthService {
    * @param plainTextPassword 입력 패스워드
    * @param hashedPassword DB 패스워드
    */
-  private async verifyPassword(
-    plainTextPassword: string,
-    hashedPassword: string
-  ) {
+  private async verifyPassword(plainTextPassword: string, hashedPassword: string) {
     const isPasswordMatch = await compare(plainTextPassword, hashedPassword);
     if (!isPasswordMatch) {
-      throw new HttpException(
-        "Wrong credentials provided",
-        HttpStatus.BAD_REQUEST
-      );
+      throw new HttpException("Wrong credentials provided", HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -121,25 +96,19 @@ export class AuthService {
    * @returns
    */
   async register(userData: CreateUserDto) {
-    const hashedPassword = await hash(userData.password, 10);
-    console.log("hashedPassword " + hashedPassword);
+    // const hashedPassword = await hash(userData.password, 10);
+    // console.log("hashedPassword " + hashedPassword);
     try {
-      const { ...returnUser } = await this.usersService.create({
+      const { ...returnUser } = await this.usersService.createUser({
         ...userData,
-        password: hashedPassword,
       });
       return HttpStatus.CREATED;
     } catch (error) {
       console.log(error);
-      throw new UnprocessableEntityException(
-        "User with that email already exits"
-      );
+      throw new UnprocessableEntityException("User with that email already exits");
 
       if (error?.code === "ER_DUP_ENTRY") {
-        throw new HttpException(
-          "User with that email already exits",
-          HttpStatus.BAD_REQUEST
-        );
+        throw new HttpException("User with that email already exits", HttpStatus.BAD_REQUEST);
       }
     }
   }
@@ -167,10 +136,7 @@ export class AuthService {
    */
   verify(jwtString: string) {
     try {
-      const payload = jwt.verify(
-        jwtString,
-        this.configService.get("JWT_ACCESS_TOKEN_SECRET")
-      ) as (jwt.JwtPayload | string) & User;
+      const payload = jwt.verify(jwtString, this.configService.get("JWT_ACCESS_TOKEN_SECRET")) as (jwt.JwtPayload | string) & User;
 
       return payload;
     } catch (e) {
@@ -190,9 +156,7 @@ export class AuthService {
       { payload },
       {
         secret: this.configService.get("JWT_ACCESS_TOKEN_SECRET"),
-        expiresIn: `${this.configService.get(
-          "JWT_ACCESS_TOKEN_EXPIRATION_TIME"
-        )}s`,
+        expiresIn: `${this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")}s`,
       }
     );
 
@@ -201,9 +165,7 @@ export class AuthService {
       domain: "localhost",
       path: "/",
       httpOnly: true,
-      maxAge:
-        Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")) *
-        1000,
+      maxAge: Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")) * 1000,
     };
   }
 
@@ -220,9 +182,7 @@ export class AuthService {
       { payload },
       {
         secret: this.configService.get("JWT_REFRESH_TOKEN_SECRET"),
-        expiresIn: `${this.configService.get(
-          "JWT_REFRESH_TOKEN_EXPIRATION_TIME"
-        )}s`,
+        expiresIn: `${this.configService.get("JWT_REFRESH_TOKEN_EXPIRATION_TIME")}s`,
       }
     );
 
@@ -231,9 +191,7 @@ export class AuthService {
       domain: "localhost",
       path: "/",
       httpOnly: true,
-      maxAge:
-        Number(this.configService.get("JWT_REFRESH_TOKEN_EXPIRATION_TIME")) *
-        1000,
+      maxAge: Number(this.configService.get("JWT_REFRESH_TOKEN_EXPIRATION_TIME")) * 1000,
     };
   }
 

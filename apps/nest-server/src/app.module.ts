@@ -29,10 +29,7 @@ import { EventsModule } from "./event/events.module";
     ConfigModule.forRoot({
       isGlobal: true,
       load: [emailConfig],
-      envFilePath:
-        process.env.NODE_ENV === "production"
-          ? ".production.env"
-          : ".development.env",
+      envFilePath: process.env.NODE_ENV === "production" ? ".production.env" : ".development.env",
       validationSchema: Joi.object({
         DATABASE_HOST: Joi.string().required(),
         DATABASE_PORT: Joi.number().required(),
