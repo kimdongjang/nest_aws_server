@@ -17,6 +17,7 @@ import { compare, hash } from "bcrypt";
 import { User } from "src/database/entities/User.entity";
 import { LocalAuthenticaion } from "src/database/entities/LocalAuthenticaion.entity";
 import { SocialAuthentication } from "src/database/entities/SocialAuthentication.entity";
+import * as bcrypt from "bcryptjs";
 
 @Injectable()
 export class UsersService {
@@ -41,10 +42,11 @@ export class UsersService {
     const user = this.usersRepository.findOne({
       where: { email: emailAddress },
     });
-    const val = user.then(v => {
-      return v === null;
-    });
-    return val;
+
+    if (!user) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -54,7 +56,10 @@ export class UsersService {
    */
   async create(userData: CreateUserDto): Promise<User> {
     const { email, username, password } = userData;
+
     const userExist = await this.checkUserExists(email);
+    console.log("userExist " + userExist);
+
     if (!userExist) {
       throw new UnprocessableEntityException(
         "해당 이메일로는 가입할 수 없습니다."
@@ -66,6 +71,7 @@ export class UsersService {
     user.username = username;
     user.isactive = false;
     user.signupVerifyToken = signupVerifyToken;
+    user.password = this.encodePassword(password);
 
     const localAuth = new LocalAuthenticaion();
     localAuth.email = user.email;
@@ -101,6 +107,12 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  // 유저 패스워드를 인코딩함
+  public encodePassword(password: string): string {
+    const salt: string = bcrypt.genSaltSync(10);
+    return bcrypt.hashSync(password, salt);
   }
 
   /**

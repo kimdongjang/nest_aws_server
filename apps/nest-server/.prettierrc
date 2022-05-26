@@ -1,13 +1,13 @@
 {
   "tabWidth": 2,
-  "printWidth": 80,
+  "printWidth": 500,
   "arrowParens": "avoid",
   "endOfLine": "auto",
   "overrides": [ 
     {
       "files": "*.json",
       "options": {
-        "printWidth": 200
+        "printWidth": 500
       }
     }
   ],

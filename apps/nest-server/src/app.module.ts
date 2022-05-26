@@ -50,9 +50,6 @@ import { EventsModule } from "./event/events.module";
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        // console.log("===== write [.env] by config: network====");
-        // console.log(config.get("email"));
-        // console.log(__dirname);
         return {
           ...config.get("email"),
           template: {
@@ -73,7 +70,7 @@ import { EventsModule } from "./event/events.module";
   providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
 })
 export class AppModule implements NestModule {
-  constructor(private connection: Connection) { }
+  constructor(private connection: Connection) {}
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes("/users");
   }

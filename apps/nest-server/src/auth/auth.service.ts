@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "src/users/users.service";
@@ -121,13 +122,19 @@ export class AuthService {
    */
   async register(userData: CreateUserDto) {
     const hashedPassword = await hash(userData.password, 10);
+    console.log("hashedPassword " + hashedPassword);
     try {
       const { ...returnUser } = await this.usersService.create({
         ...userData,
         password: hashedPassword,
       });
-      return returnUser;
+      return HttpStatus.CREATED;
     } catch (error) {
+      console.log(error);
+      throw new UnprocessableEntityException(
+        "User with that email already exits"
+      );
+
       if (error?.code === "ER_DUP_ENTRY") {
         throw new HttpException(
           "User with that email already exits",
