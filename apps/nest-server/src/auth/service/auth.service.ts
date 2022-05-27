@@ -46,10 +46,14 @@ export class AuthService {
         httpOnly: true,
         maxAge: 0,
         status: HttpStatus.NOT_FOUND,
-        data: user,
+        data: null,
         error: ["E-Mail not found"],
+        accessToken: null,
+        refreshToken: null,
       };
     }
+    console.log(user);
+    console.log(user.password);
     const isPasswordValid: boolean = await this.usersService.isPasswordValid(user.password, userLoginDto.password);
     if (!isPasswordValid) {
       return {
@@ -58,8 +62,10 @@ export class AuthService {
         httpOnly: true,
         maxAge: 0,
         status: HttpStatus.NOT_FOUND,
-        data: user,
+        data: null,
         error: ["Password wrong"],
+        accessToken: null,
+        refreshToken: null,
       };
     }
 
@@ -71,7 +77,16 @@ export class AuthService {
       }
     );
 
-    const payload = {
+    const refreshToken = this.jwtService.sign(
+      { user: user },
+      {
+        secret: this.configService.get("JWT_REFRESH_TOKEN__SECRET"),
+        expiresIn: Number(this.configService.get("JWT_REFRESH_TOKEN_EXPIRATION_TIME")),
+      }
+    );
+    await this.usersService.setCurrentRefreshToken(refreshToken, user.email);
+
+    return {
       // access_token: this.jwtService.sign(JSON.stringify(payload), this.configService.get("JWT_ACCESS_TOKEN_SECRET")),
       domain: this.configService.get("DOMAIN"),
       path: "/",
@@ -80,9 +95,9 @@ export class AuthService {
       status: HttpStatus.ACCEPTED,
       data: user,
       error: "",
+      accessToken: accessToken,
+      refreshToken: refreshToken,
     };
-
-    return { payload, accessToken };
   }
 
   /**
@@ -138,9 +153,7 @@ export class AuthService {
     // const hashedPassword = await hash(userData.password, 10);
     // console.log("hashedPassword " + hashedPassword);
     try {
-      const { ...returnUser } = await this.usersService.createUser({
-        ...userData,
-      });
+      const { ...returnUser } = await this.usersService.createUser(userData);
       return HttpStatus.CREATED;
     } catch (error) {
       console.log(error);

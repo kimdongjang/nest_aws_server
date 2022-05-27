@@ -38,7 +38,7 @@ export class UsersService {
     const userExist = await this.findByEmail(email);
     console.log("userExist " + userExist);
 
-    if (!userExist) {
+    if (userExist) {
       throw new UnprocessableEntityException("해당 이메일로는 가입할 수 없습니다.");
     }
     // uuid를 사용해 랜덤한 데이터로 토큰화하고, 이메일 인증에서 사용

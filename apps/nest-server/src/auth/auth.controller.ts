@@ -38,26 +38,13 @@ export class AuthController {
   async login(@Body() body: UserLoginDto, @Res({ passthrough: true }) res: Response) {
     // user 이메일을 통해 user 데이터를 조회후 jwt토큰으로 변경
     // const { accessToken, ...accessOption } = await this.authService.getCookieWithJwtAccessToken(body.email);
-    const { accessToken, ...accessOption } = await this.authService.login(body);
-
-    const { refreshToken, ...refreshOption } = await this.authService.getCookieWithJwtRefreshToken(body.email);
-
-    await this.usersService.setCurrentRefreshToken(refreshToken, body.email);
+    const payload = await this.authService.login(body);
 
     // 쿠키에 jwt토큰과 refresh 토큰을 저장
-    res.cookie("Authentication", accessToken, accessOption.payload);
-    res.cookie("Refresh", refreshToken, refreshOption);
-    const status = HttpStatus.OK;
+    res.cookie("Authentication", payload.accessToken);
+    res.cookie("Refresh", payload.refreshToken);
 
-    const value = {
-      result: {
-        status: status,
-      },
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-      payload: accessOption.payload,
-    };
-    return value;
+    return payload;
 
     // //  이메일과 패스워드 받아서 로그인. jwt 토큰 반환
     // const { access_token, ...option } = await this.authService.login(req.body);
@@ -88,7 +75,7 @@ export class AuthController {
     const user = req.body;
     console.log(user);
     const { accessToken: access_token, ...accessOption } = await this.authService.login(user.email);
-    res.cookie("Authentication", access_token, accessOption.payload);
+    res.cookie("Authentication", access_token);
 
     return user;
   }
