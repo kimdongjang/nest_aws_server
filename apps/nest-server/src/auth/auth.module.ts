@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { PassportModule } from "@nestjs/passport";
-import { AuthService } from "./auth.service";
+import { AuthService } from "./service/auth.service";
 import { AuthController } from "./auth.controller";
 import { JwtModule } from "@nestjs/jwt";
 import { APP_GUARD } from "@nestjs/core";
@@ -14,6 +14,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { LocalStrategy } from "./strategies/local.strategy";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { JwtRefreshStrategy } from "./strategies/jwt-refresh.strategy";
+import { JwtService } from "./service/jwt.service";
 
 @Module({
   imports: [
@@ -24,23 +25,15 @@ import { JwtRefreshStrategy } from "./strategies/jwt-refresh.strategy";
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get("JWT_ACCESS_TOKEN_SECRET"),
         signOptions: {
-          expiresIn: `${configService.get(
-            "JWT_ACCESS_TOKEN_EXPIRATION_TIME"
-          )}s`,
+          expiresIn: `${configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")}s`,
         },
       }),
     }),
     UsersModule,
     ConfigModule,
   ],
-  providers: [
-    AuthService,
-    JwtStrategy,
-    GoogleStrategy,
-    LocalStrategy,
-    JwtRefreshStrategy,
-  ],
-  exports: [AuthService, JwtModule],
+  providers: [AuthService, JwtService, JwtStrategy, GoogleStrategy, LocalStrategy, JwtRefreshStrategy],
+  exports: [AuthService, JwtService, JwtModule],
   controllers: [AuthController],
 })
 export class AuthModule {}

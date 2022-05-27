@@ -6,7 +6,7 @@ import * as path from "path";
 import { AuthModule } from "./auth/auth.module";
 import { PassportModule } from "@nestjs/passport";
 import { JwtModule } from "@nestjs/jwt";
-import { AuthService } from "./auth/auth.service";
+import { AuthService } from "./auth/service/auth.service";
 import { JwtAuthGuard } from "./auth/guards/jwt-auth.guard";
 import { APP_GUARD } from "@nestjs/core";
 import { LoggerMiddleware } from "./logger.middleware";

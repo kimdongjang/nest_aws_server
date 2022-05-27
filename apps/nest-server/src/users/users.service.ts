@@ -1,16 +1,17 @@
-import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException, UnprocessableEntityException } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException, NotFoundException, UnprocessableEntityException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Connection, Repository } from "typeorm";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import * as uuid from "uuid";
 import { EmailService } from "src/email/email.service";
-import { AuthService } from "src/auth/auth.service";
+import { AuthService } from "src/auth/service/auth.service";
 import { compare, hash } from "bcrypt";
 import { User } from "src/database/entities/User.entity";
 import { LocalAuthenticaion } from "src/database/entities/LocalAuthenticaion.entity";
 import { SocialAuthentication } from "src/database/entities/SocialAuthentication.entity";
 import * as bcrypt from "bcryptjs";
+import { JwtService } from "src/auth/service/jwt.service";
 
 @Injectable()
 export class UsersService {
@@ -23,24 +24,8 @@ export class UsersService {
     @InjectRepository(SocialAuthentication)
     private socialAuthRepository: Repository<SocialAuthentication>,
     private connection: Connection,
-    private emailService: EmailService
+    private emailService: EmailService // @Inject(JwtService) // private jwtService: JwtService
   ) {}
-
-  /**
-   * 입력받은 이메일로 이메일 존재여부확인
-   * @param emailAddress
-   * @returns
-   */
-  private async checkUserExists(emailAddress: string): Promise<boolean> {
-    const user = this.usersRepository.findOne({
-      where: { email: emailAddress },
-    });
-
-    if (!user) {
-      return false;
-    }
-    return true;
-  }
 
   /**
    * 유저 데이터 생성
@@ -50,12 +35,13 @@ export class UsersService {
   async createUser(userData: CreateUserDto): Promise<User> {
     const { email, username, password } = userData;
 
-    const userExist = await this.checkUserExists(email);
+    const userExist = await this.findByEmail(email);
     console.log("userExist " + userExist);
 
     if (!userExist) {
       throw new UnprocessableEntityException("해당 이메일로는 가입할 수 없습니다.");
     }
+    // uuid를 사용해 랜덤한 데이터로 토큰화하고, 이메일 인증에서 사용
     const signupVerifyToken = uuid.v1();
 
     const user = new User();
@@ -96,19 +82,13 @@ export class UsersService {
     return user;
   }
 
-  // 유저 패스워드를 인코딩함
-  public encodePassword(password: string): string {
-    const salt: string = bcrypt.genSaltSync(10);
-    return bcrypt.hashSync(password, salt);
-  }
-
   /**
    * 리프레시 토큰을 해쉬함수로 변환해서 DB에 업데이트
    * @param refreshToken
    * @param id
    */
   async setCurrentRefreshToken(refreshToken: string, email: string) {
-    const currentHashedRefreshToken = await hash(refreshToken, 10);
+    const currentHashedRefreshToken = await this.setHashToken(refreshToken);
     console.log(currentHashedRefreshToken);
     await this.usersRepository.update(
       { email: email },
@@ -136,6 +116,30 @@ export class UsersService {
   }
 
   /**
+   *  유저 패스워드가 유효한지 확인함
+   * @param password
+   * @param inputPassword
+   * @returns
+   */
+  public isPasswordValid(password: string, inputPassword: string): boolean {
+    return bcrypt.compareSync(password, inputPassword);
+  }
+
+  /**
+   *  유저 패스워드를 인코딩함
+   * @param password
+   * @returns
+   */
+  public encodePassword(password: string): string {
+    const salt: string = bcrypt.genSaltSync(10);
+    return bcrypt.hashSync(password, salt);
+  }
+
+  public async setHashToken(token: string) {
+    return hash(token, 10);
+  }
+
+  /**
    *
    * @param id
    * @returns
@@ -154,7 +158,11 @@ export class UsersService {
   }
 
   async findByName(username: string): Promise<User | undefined> {
-    return this.usersRepository.findOne({ where: { username } });
+    const user = this.usersRepository.findOne({ where: { username } });
+    if (user) {
+      return user;
+    }
+    throw new HttpException("User with this name does not exist", HttpStatus.NOT_FOUND);
   }
 
   async findByEmail(email: string): Promise<User | undefined> {
@@ -164,14 +172,18 @@ export class UsersService {
     }
     throw new HttpException("User with this email does not exist", HttpStatus.NOT_FOUND);
   }
-  async findByToken(signupVerifyToken: string): Promise<User | undefined> {
-    return this.usersRepository.findOne({
+  async findBySignupVerifyToken(signupVerifyToken: string): Promise<User | undefined> {
+    const user = this.usersRepository.findOne({
       where: { signupVerifyToken: signupVerifyToken },
     });
+    if (user) {
+      return user;
+    }
+    throw new HttpException("User does not exist", HttpStatus.NOT_FOUND);
   }
 
-  update(username: string, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${username} user`;
+  update(updateUserDto: UpdateUserDto) {
+    return `This action updates a #${updateUserDto.username} user`;
   }
 
   remove(username: string) {

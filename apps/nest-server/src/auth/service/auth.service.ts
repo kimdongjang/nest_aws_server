@@ -1,11 +1,11 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
+import { HttpException, HttpStatus, Inject, Injectable, NotFoundException, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
 import { UsersService } from "src/users/users.service";
-import * as jwt from "jsonwebtoken";
 import { compare, hash } from "bcrypt";
 import { CreateUserDto } from "src/users/dto/create-user.dto";
 import { ConfigService } from "@nestjs/config";
 import { User } from "src/database/entities/User.entity";
+import { UserLoginDto } from "src/users/dto/login-user.dto";
+import { JwtService, JwtVerifyOptions } from "@nestjs/jwt";
 
 // username과 password를 통해 인증을 진행
 // 한번 인증되었다면 서버는 특정 request에서 인증 상태를 확인하기 위해 jwt를 발급
@@ -32,18 +32,57 @@ export class AuthService {
     };
   }
 
-  // local.stragtegy에서 정의한 email과 password로 validate를 검사하는 과정을 진행함
-  async login(user: User) {
-    const payload = await this.usersService.findByEmail(user.email);
-    const token = {
-      access_token: jwt.sign(JSON.stringify(payload), this.configService.get("JWT_ACCESS_TOKEN_SECRET")),
+  /**
+   * local.stragtegy에서 정의한 email과 password로 validate를 검사하는 과정을 진행하며 jwt 토큰이 포함된 로그인 정보를 리턴함
+   * @param user UserLoginDto(email, password)
+   * @returns  jwt 액세스 토큰이 포함된 로그인 정보를 리턴
+   */
+  async login(userLoginDto: UserLoginDto) {
+    const user = await this.usersService.findByEmail(userLoginDto.email);
+    if (!user) {
+      return {
+        domain: this.configService.get("DOMAIN"),
+        path: "/",
+        httpOnly: true,
+        maxAge: 0,
+        status: HttpStatus.NOT_FOUND,
+        data: user,
+        error: ["E-Mail not found"],
+      };
+    }
+    const isPasswordValid: boolean = await this.usersService.isPasswordValid(user.password, userLoginDto.password);
+    if (!isPasswordValid) {
+      return {
+        domain: this.configService.get("DOMAIN"),
+        path: "/",
+        httpOnly: true,
+        maxAge: 0,
+        status: HttpStatus.NOT_FOUND,
+        data: user,
+        error: ["Password wrong"],
+      };
+    }
+
+    const accessToken = this.jwtService.sign(
+      { user: user },
+      {
+        secret: this.configService.get("JWT_ACCESS_TOKEN_SECRET"),
+        expiresIn: Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")),
+      }
+    );
+
+    const payload = {
+      // access_token: this.jwtService.sign(JSON.stringify(payload), this.configService.get("JWT_ACCESS_TOKEN_SECRET")),
       domain: this.configService.get("DOMAIN"),
       path: "/",
       httpOnly: true,
-      maxAge: Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")) * 1000,
+      maxAge: Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME") * 1000),
+      status: HttpStatus.ACCEPTED,
+      data: user,
+      error: "",
     };
 
-    return token;
+    return { payload, accessToken };
   }
 
   /**
@@ -120,7 +159,7 @@ export class AuthService {
    */
   async verifyEmail(signupVerifyToken: string) {
     // 1. DB에서 signupVerifyToken으로 회원 가입 처리중인 유저가 있는지 조회하고 없다면 에러 처리
-    const user = await this.usersService.findByToken(signupVerifyToken);
+    const user = await this.usersService.findBySignupVerifyToken(signupVerifyToken);
 
     if (!user) {
       throw new NotFoundException("유저가 존재하지 않습니다");
@@ -130,13 +169,20 @@ export class AuthService {
   }
 
   /**
+   * jwt token을 디코딩함
+   */
+  public async decode(token: string): Promise<unknown> {
+    return this.jwtService.decode(token);
+  }
+
+  /**
    * jwt 토큰으로 검사
-   * @param jwtString
+   * @param jwtToken
    * @returns
    */
-  verify(jwtString: string) {
+  verify(jwtToken: string) {
     try {
-      const payload = jwt.verify(jwtString, this.configService.get("JWT_ACCESS_TOKEN_SECRET")) as (jwt.JwtPayload | string) & User;
+      const payload = this.jwtService.verify(jwtToken, this.configService.get("JWT_ACCESS_TOKEN_SECRET"));
 
       return payload;
     } catch (e) {
@@ -152,21 +198,23 @@ export class AuthService {
   async getCookieWithJwtAccessToken(email: string) {
     // const payload = { email };
     const payload = await this.usersService.findByEmail(email);
-    const token = this.jwtService.sign(
-      { payload },
-      {
-        secret: this.configService.get("JWT_ACCESS_TOKEN_SECRET"),
-        expiresIn: `${this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")}s`,
-      }
-    );
+    return this.login(payload);
 
-    return {
-      accessToken: token,
-      domain: "localhost",
-      path: "/",
-      httpOnly: true,
-      maxAge: Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")) * 1000,
-    };
+    // const token = this.jwtService.sign(
+    //   { payload },
+    //   {
+    //     secret: this.configService.get("JWT_ACCESS_TOKEN_SECRET"),
+    //     expiresIn: `${this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")}s`,
+    //   }
+    // );
+
+    // return {
+    //   accessToken: token,
+    //   domain: "localhost",
+    //   path: "/",
+    //   httpOnly: true,
+    //   maxAge: Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")) * 1000,
+    // };
   }
 
   /**
@@ -175,19 +223,18 @@ export class AuthService {
    * @returns
    */
   async getCookieWithJwtRefreshToken(email: string) {
-    // const payload = { email };
-    const payload = await this.usersService.findByEmail(email);
+    const user = await this.usersService.findByEmail(email);
 
-    const token = this.jwtService.sign(
-      { payload },
+    const refreshToken = this.jwtService.sign(
+      { user: user },
       {
-        secret: this.configService.get("JWT_REFRESH_TOKEN_SECRET"),
-        expiresIn: `${this.configService.get("JWT_REFRESH_TOKEN_EXPIRATION_TIME")}s`,
+        secret: this.configService.get("JWT_REFRESH_TOKEN__SECRET"),
+        expiresIn: Number(this.configService.get("JWT_REFRESH_TOKEN_EXPIRATION_TIME")),
       }
     );
 
     return {
-      refreshToken: token,
+      refreshToken: refreshToken,
       domain: "localhost",
       path: "/",
       httpOnly: true,
