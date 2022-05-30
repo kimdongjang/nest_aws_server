@@ -5,17 +5,12 @@ import { ExtractJwt, Strategy } from "passport-jwt";
 import { UsersService } from "src/users/users.service";
 
 @Injectable()
-export class JwtRefreshStrategy extends PassportStrategy(
-  Strategy,
-  "jwt-refresh-token"
-) {
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly usersService: UsersService
-  ) {
+export class JwtRefreshStrategy extends PassportStrategy(Strategy) {
+  constructor(private readonly configService: ConfigService, private readonly usersService: UsersService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         request => {
+          console.log(request);
           return request?.cookies?.Refresh;
         },
       ]),
@@ -27,9 +22,6 @@ export class JwtRefreshStrategy extends PassportStrategy(
   async validate(req, payload: any) {
     console.log("refresh token validate");
     const refreshToken = req.cookies?.Refresh;
-    return this.usersService.getUserIfRefreshTokenMatches(
-      refreshToken,
-      payload.email
-    );
+    return this.usersService.getUserIfRefreshTokenMatches(refreshToken, payload.email);
   }
 }

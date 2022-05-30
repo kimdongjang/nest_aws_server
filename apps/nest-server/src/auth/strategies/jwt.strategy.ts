@@ -4,6 +4,7 @@ import { JwtService } from "@nestjs/jwt";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt } from "passport-jwt";
 import { Strategy } from "passport-jwt";
+import { User } from "src/database/entities/User.entity";
 import { UsersService } from "src/users/users.service";
 
 @Injectable()
@@ -17,6 +18,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
       jwtFromRequest: ExtractJwt.fromExtractors([
         request => {
           try {
+            console.log("2. jwtFromRequest 호출 ");
+            console.log(request?.cookies?.Authentication);
             return request?.cookies?.Authentication;
           } catch (error) {
             throw new HttpException("Not Found your email", HttpStatus.NOT_FOUND);
@@ -24,6 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
         },
       ]),
       // ignoreExpiration: false라면 jwt가 만료되었는지 확인하고, 만료되었다면 401에러 발생
+      //true로 설정하면 Passport에 토큰 검증을 위임하지 않고 직접 검증, false는 Passport에 검증 위임
       ignoreExpiration: false,
       secretOrKey: configService.get("JWT_ACCESS_TOKEN_SECRET"),
     });
@@ -33,11 +37,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
    * @param payload
    * @returns
    */
-  async validate(token: string): Promise<any | never> {
-    console.log("jwt strategy " + token);
-    return this.jwtService.verify(token, this.configService.get("JWT_ACCESS_TOKEN_SECRET"));
+  async validate(payload): Promise<any | never> {
+    console.log("3. validate 호출 ");
+    try {
+      return this.usersService.findByEmail(payload.user.email);
+    } catch (error) {
+      throw new HttpException("Not Found your email", HttpStatus.NOT_FOUND);
+    }
+    // return this.jwtService.verify(token, this.configService.get("JWT_ACCESS_TOKEN_SECRET"));
   }
-  // async validate(payload: any) {
-  //   return this.usersService.findByEmail(payload.email);
-  // }
 }

@@ -25,6 +25,17 @@ export class GoogleStrategy extends PassportStrategy(Strategy, "google") {
       accessToken,
       refreshToken,
     };
+
+    // 로그인이 안되어있으면 회원가입하는 로직
+    // if (!user) {
+    //   user = await this.usersService.create({
+    //     provider: 'google',
+    //     providerId: id,
+    //     name: name.givenName,
+    //     username: emails[0].value,
+    //   });
+    // }
+
     done(null, user);
   }
 }

@@ -36,6 +36,7 @@ import { EventsModule } from "./event/events.module";
         DATABASE_USERNAME: Joi.string().required(),
         DATABASE_PASSWORD: Joi.string().required(),
         DATABASE_NAME: Joi.string().required(),
+        DATABASE_SYNCHRONIZE: Joi.string().required(),
 
         JWT_ACCESS_TOKEN_SECRET: Joi.string().required(),
         JWT_ACCESS_TOKEN_EXPIRATION_TIME: Joi.string().required(),

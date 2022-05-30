@@ -7,11 +7,13 @@ import { Public } from "src/skip-auth.decorator";
 import { CreateUserDto } from "src/users/dto/create-user.dto";
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "./service/auth.service";
-import { CustomGuard } from "./passsport/custom.guard";
+import { CustomGuard } from "./guards/custom.guard";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { JwtRefreshGuard } from "./guards/jwt-refresh.guard";
 import { User } from "src/database/entities/User.entity";
 import { UserLoginDto } from "src/users/dto/login-user.dto";
+import { JwtStrategy } from "./strategies/jwt.strategy";
+import { JwtRefreshStrategy } from "./strategies/jwt-refresh.strategy";
 
 @ApiTags("AuthApi")
 @Controller("auth")
@@ -36,8 +38,6 @@ export class AuthController {
   @Post("/login")
   // async login(@Request() req, @Res({ passthrough: true }) res: Response) {
   async login(@Body() body: UserLoginDto, @Res({ passthrough: true }) res: Response) {
-    // user 이메일을 통해 user 데이터를 조회후 jwt토큰으로 변경
-    // const { accessToken, ...accessOption } = await this.authService.getCookieWithJwtAccessToken(body.email);
     const payload = await this.authService.login(body);
 
     // 쿠키에 jwt토큰과 refresh 토큰을 저장
@@ -45,32 +45,25 @@ export class AuthController {
     res.cookie("Refresh", payload.refreshToken);
 
     return payload;
-
-    // //  이메일과 패스워드 받아서 로그인. jwt 토큰 반환
-    // const { access_token, ...option } = await this.authService.login(req.body);
-    // console.log(access_token);
-    // console.log(option);
-    // // jwt 토큰 쿠키에 저장
-    // res.cookie("Authentication", access_token, option);
   }
 
-  @UseGuards(JwtRefreshGuard)
-  @Post("/logout")
+  @UseGuards(JwtStrategy)
+  @Get("/logout")
   async logOut(@Req() req, @Res({ passthrough: true }) res: Response) {
     // const { access_token, ...option } = await this.authService.logOut();
     // res.cookie("Authentication", access_token, option);
+    console.log("5. 컨트롤러 호출 ");
     const { accessOption, refreshOption } = this.authService.getCookiesForLogOut();
-
     await this.usersService.removeRefreshToken(req.body.email);
 
     res.cookie("Authentication", "", accessOption);
     res.cookie("Refresh", "", refreshOption);
 
-    return 1;
+    return HttpStatus.OK;
   }
 
-  @UseGuards(JwtRefreshGuard)
-  @Get("refresh")
+  @UseGuards(JwtStrategy)
+  @Get("/refresh")
   async refresh(@Req() req, @Res({ passthrough: true }) res: Response) {
     const user = req.body;
     console.log(user);
@@ -80,6 +73,7 @@ export class AuthController {
     return user;
   }
 
+  @UseGuards(JwtStrategy)
   @Get("profile")
   getProfile(@Request() req) {
     return req.user;
@@ -95,11 +89,15 @@ export class AuthController {
   @Public()
   @Get("google/callback")
   @UseGuards(AuthGuard("google"))
-  googleAuthRedirect(@Req() req) {
-    console.log(req);
-    const res = this.authService.googleLogin(req);
-    // console.log(res);
-    return res;
+  async googleAuthRedirect(@Req() req, @Res({ passthrough: true }) res: Response) {
+    // console.log(req);
+    const payload = await this.authService.googleLogin(req); // 만약 회원 정보가 없다면 회원가입으로 이동시키던지 어쩌구...
+
+    // 쿠키에 jwt토큰과 refresh 토큰을 저장
+    res.cookie("Authentication", payload.accessToken);
+    res.cookie("Refresh", payload.refreshToken);
+
+    return payload;
   }
 
   @UseGuards(CustomGuard)

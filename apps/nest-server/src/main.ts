@@ -7,11 +7,7 @@ import { LoggerMiddleware } from "./logger.middleware";
 import cookieParser from "cookie-parser";
 
 dotenv.config({
-  path: path.resolve(
-    process.env.NODE_ENV === "production"
-      ? ".production.env"
-      : ".development.env"
-  ),
+  path: path.resolve(process.env.NODE_ENV === "production" ? ".production.env" : ".development.env"),
 });
 
 async function bootstrap() {

@@ -14,7 +14,6 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { LocalStrategy } from "./strategies/local.strategy";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { JwtRefreshStrategy } from "./strategies/jwt-refresh.strategy";
-import { JwtService } from "./service/jwt.service";
 
 @Module({
   imports: [
@@ -32,8 +31,8 @@ import { JwtService } from "./service/jwt.service";
     UsersModule,
     ConfigModule,
   ],
-  providers: [AuthService, JwtService, JwtStrategy, GoogleStrategy, LocalStrategy, JwtRefreshStrategy],
-  exports: [AuthService, JwtService, JwtModule],
+  providers: [AuthService, JwtStrategy, GoogleStrategy, JwtRefreshStrategy],
+  exports: [AuthService, JwtModule],
   controllers: [AuthController],
 })
 export class AuthModule {}

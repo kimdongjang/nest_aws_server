@@ -11,7 +11,6 @@ import { User } from "src/database/entities/User.entity";
 import { LocalAuthenticaion } from "src/database/entities/LocalAuthenticaion.entity";
 import { SocialAuthentication } from "src/database/entities/SocialAuthentication.entity";
 import * as bcrypt from "bcryptjs";
-import { JwtService } from "src/auth/service/jwt.service";
 
 @Injectable()
 export class UsersService {
@@ -34,17 +33,14 @@ export class UsersService {
    */
   async createUser(userData: CreateUserDto): Promise<User> {
     const { email, username, password } = userData;
-
-    const userExist = await this.findByEmail(email);
-    console.log("userExist " + userExist);
-
-    if (userExist) {
-      throw new UnprocessableEntityException("해당 이메일로는 가입할 수 없습니다.");
+    let user = await this.usersRepository.findOne({ where: { email: email } });
+    if (user) {
+      throw new UnprocessableEntityException("E-Mail already exist");
     }
     // uuid를 사용해 랜덤한 데이터로 토큰화하고, 이메일 인증에서 사용
     const signupVerifyToken = uuid.v1();
 
-    const user = new User();
+    user = new User();
     user.email = email;
     user.username = username;
     user.isactive = false;
@@ -117,12 +113,12 @@ export class UsersService {
 
   /**
    *  유저 패스워드가 유효한지 확인함
+   * @param userPassword
    * @param password
-   * @param inputPassword
    * @returns
    */
-  public isPasswordValid(password: string, inputPassword: string): boolean {
-    return bcrypt.compareSync(password, inputPassword);
+  public isPasswordValid(userPassword: string, password: string): boolean {
+    return bcrypt.compareSync(userPassword, password);
   }
 
   /**
@@ -166,7 +162,7 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<User | undefined> {
-    const user = this.usersRepository.findOne({ where: { email: email } });
+    const user = await this.usersRepository.findOne({ where: { email } });
     if (user) {
       return user;
     }

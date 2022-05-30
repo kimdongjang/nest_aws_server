@@ -3,7 +3,8 @@ import { User } from "./User.entity";
 
 @Entity()
 export class SocialAuthentication {
-  @OneToOne(() => User)
+  @OneToOne(() => User, user => user.email)
+  @JoinColumn()
   @PrimaryColumn("varchar", { primary: true, name: "email", length: 255, unique: true })
   email: string;
 

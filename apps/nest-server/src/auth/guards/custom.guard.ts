@@ -10,15 +10,14 @@ import { AuthService } from "../service/auth.service";
 export class CustomGuard implements CanActivate {
   constructor(private authService: AuthService) {}
 
-  canActivate(
-    context: ExecutionContext
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
     return this.validateRequest(request);
   }
 
   private validateRequest(request: Request) {
     const jwtString = request.headers.authorization.split("Bearer ")[1];
+    console.log(jwtString);
 
     this.authService.verify(jwtString);
 

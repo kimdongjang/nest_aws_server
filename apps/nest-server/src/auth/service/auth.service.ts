@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable, NotFoundException, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, HttpException, HttpStatus, Inject, Injectable, NotFoundException, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
 import { UsersService } from "src/users/users.service";
 import { compare, hash } from "bcrypt";
 import { CreateUserDto } from "src/users/dto/create-user.dto";
@@ -19,17 +19,85 @@ export class AuthService {
    * @param req
    * @returns
    */
-  googleLogin(req) {
-    if (!req.user) {
-      return {
-        message: "No user from google",
-        user: null,
-      };
-    }
+  async googleLogin(req) {
+    // console.log(req.user);
+
+    const accessToken = this.jwtService.sign(
+      { user: req.user },
+      {
+        secret: this.configService.get("JWT_ACCESS_TOKEN_SECRET"),
+        expiresIn: Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")),
+      }
+    );
+
+    const refreshToken = this.jwtService.sign(
+      { user: req.user },
+      {
+        secret: this.configService.get("JWT_REFRESH_TOKEN__SECRET"),
+        expiresIn: Number(this.configService.get("JWT_REFRESH_TOKEN_EXPIRATION_TIME")),
+      }
+    );
+    await this.usersService.setCurrentRefreshToken(refreshToken, req.user.email);
+
     return {
-      message: "User information from google",
-      user: req.user,
+      // access_token: this.jwtService.sign(JSON.stringify(payload), this.configService.get("JWT_ACCESS_TOKEN_SECRET")),
+      domain: this.configService.get("DOMAIN"),
+      path: "/",
+      httpOnly: true,
+      maxAge: Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME") * 1000),
+      status: HttpStatus.ACCEPTED,
+      data: req.user,
+      error: "",
+      accessToken: accessToken,
+      refreshToken: refreshToken,
     };
+
+    // if (!data.user) throw new BadRequestException();
+
+    // const user = await this.usersService.findByEmail(data.user.email);
+    // if (user) return this.login(user);
+
+    // // user = this.usersService.findByEmail(data.user.email);
+    // // if (user) throw new ForbiddenException("User already exists, but Google account was not connected to user's account");
+
+    // // try {
+    // //   const newUser = new User();
+    // //   newUser.firstName = data.user.firstName;
+    // //   newUser.lastName = data.user.lastName;
+    // //   newUser.email = data.user.email;
+    // //   newUser.googleId = data.user.id;
+
+    // //   await this.usersService.store(newUser);
+    // //   return this.login(newUser);
+    // // } catch (e) {
+    // //   throw new Error(e);
+    // // }
+    // return user;
+  }
+
+  /**
+   * 유저 데이터를 생성할때 hash값으로 패스워드를 생성
+   * @param user
+   * @returns
+   */
+  async register(userData: CreateUserDto) {
+    try {
+      const user = await this.usersService.createUser(userData);
+      if (!user) {
+        return {
+          domain: this.configService.get("DOMAIN"),
+          path: "/",
+          httpOnly: true,
+          maxAge: 0,
+          status: HttpStatus.CREATED,
+          data: null,
+          accessToken: null,
+          refreshToken: null,
+        };
+      }
+    } catch (error) {
+      throw new UnprocessableEntityException("User with that email already exits");
+    }
   }
 
   /**
@@ -52,9 +120,8 @@ export class AuthService {
         refreshToken: null,
       };
     }
-    console.log(user);
-    console.log(user.password);
-    const isPasswordValid: boolean = await this.usersService.isPasswordValid(user.password, userLoginDto.password);
+
+    const isPasswordValid: boolean = await this.usersService.isPasswordValid(userLoginDto.password, user.password);
     if (!isPasswordValid) {
       return {
         domain: this.configService.get("DOMAIN"),
@@ -141,27 +208,6 @@ export class AuthService {
     const isPasswordMatch = await compare(plainTextPassword, hashedPassword);
     if (!isPasswordMatch) {
       throw new HttpException("Wrong credentials provided", HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  /**
-   * 유저 데이터를 생성할때 hash값으로 패스워드를 생성
-   * @param user
-   * @returns
-   */
-  async register(userData: CreateUserDto) {
-    // const hashedPassword = await hash(userData.password, 10);
-    // console.log("hashedPassword " + hashedPassword);
-    try {
-      const { ...returnUser } = await this.usersService.createUser(userData);
-      return HttpStatus.CREATED;
-    } catch (error) {
-      console.log(error);
-      throw new UnprocessableEntityException("User with that email already exits");
-
-      if (error?.code === "ER_DUP_ENTRY") {
-        throw new HttpException("User with that email already exits", HttpStatus.BAD_REQUEST);
-      }
     }
   }
 
