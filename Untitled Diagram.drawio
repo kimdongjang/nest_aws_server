@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2022-05-31T07:31:00.322Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.61 Safari/537.36" etag="CYzJp-AGW_eknXsGpFc-" version="18.0.1" type="github">
+<mxfile host="app.diagrams.net" modified="2022-05-31T07:36:50.709Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.61 Safari/537.36" etag="nFQd3dcv1Eo1LmxcM5DB" version="18.0.1" type="github">
   <diagram id="upFG02rAQi9TBVUUuuCd" name="Page-1">
     <mxGraphModel dx="1349" dy="802" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -7,7 +7,7 @@
         <mxCell id="FiZGSp2ZepkQso1qt76i-15" value="GUARD" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CCE5FF;" vertex="1" parent="1">
           <mxGeometry x="110" y="200" width="200" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="FiZGSp2ZepkQso1qt76i-1" value="API Gateway&lt;br&gt;(3000)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="FiZGSp2ZepkQso1qt76i-1" value="API Gateway&lt;br&gt;(3000)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
           <mxGeometry x="150" y="130" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="FiZGSp2ZepkQso1qt76i-2" value="client" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
