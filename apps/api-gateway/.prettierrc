@@ -1,4 +1,16 @@
 {
-  "singleQuote": true,
-  "trailingComma": "all"
+  "tabWidth": 2,
+  "printWidth": 500,
+  "arrowParens": "avoid",
+  "endOfLine": "auto",
+  "overrides": [ 
+    {
+      "files": "*.json",
+      "options": {
+        "printWidth": 500
+      }
+    }
+  ],
+  "prettier/prettier": ["error", {"singleQuote": false,"parser": "@babel/eslint-parser"}]
+
 }

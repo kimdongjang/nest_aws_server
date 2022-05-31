@@ -22,16 +22,16 @@ export class AppController {
     return this.appService.pingServiceB();
   }
 
-  @Get('/ping-all')
-  pingAll() {
-    return zip(
-      this.appService.pingServiceA(),
-      this.appService.pingServiceB(),
-    ).pipe(
-      map(([pongServiceA, pongServiceB]) => ({
-        pongServiceA,
-        pongServiceB,
-      })),
-    );
-  }
+  // @Get('/ping-all')
+  // pingAll() {
+  //   return zip(
+  //     this.appService.pingServiceA(),
+  //     this.appService.pingServiceB(),
+  //   ).pipe(
+  //     map(([pongServiceA, pongServiceB]) => ({
+  //       pongServiceA,
+  //       pongServiceB,
+  //     })),
+  //   );
+  // }
 }
