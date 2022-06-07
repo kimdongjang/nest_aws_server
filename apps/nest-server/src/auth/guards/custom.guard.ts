@@ -16,6 +16,7 @@ export class CustomGuard implements CanActivate {
   }
 
   private validateRequest(request: Request) {
+    console.log("custom");
     const jwtString = request.headers.authorization.split("Bearer ")[1];
     console.log(jwtString);
 

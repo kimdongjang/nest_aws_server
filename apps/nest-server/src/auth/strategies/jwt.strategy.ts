@@ -4,7 +4,6 @@ import { JwtService } from "@nestjs/jwt";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt } from "passport-jwt";
 import { Strategy } from "passport-jwt";
-import { User } from "src/database/entities/User.entity";
 import { UsersService } from "src/users/users.service";
 
 @Injectable()
@@ -18,8 +17,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
       jwtFromRequest: ExtractJwt.fromExtractors([
         request => {
           try {
-            console.log("2. jwtFromRequest 호출 ");
-            console.log(request?.cookies?.Authentication);
             return request?.cookies?.Authentication;
           } catch (error) {
             throw new HttpException("Not Found your email", HttpStatus.NOT_FOUND);

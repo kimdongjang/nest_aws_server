@@ -1,20 +1,19 @@
-import { Body, Controller, Get, Headers, HttpStatus, Param, Post, Query, Req, Request, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpStatus, Param, Post, Query, Req, Request, Res, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
 import { VerifyEmailDto } from "src/email/dto/verify-email.dto";
-import { Public } from "src/skip-auth.decorator";
+// import { Public } from "src/skip-auth.decorator";
 import { CreateUserDto } from "src/users/dto/create-user.dto";
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";
 import { CustomGuard } from "./guards/custom.guard";
-import { JwtAuthGuard } from "./guards/jwt-auth.guard";
-import { JwtRefreshGuard } from "./guards/jwt-refresh.guard";
 import { User } from "src/database/entities/User.entity";
 import { UserLoginDto } from "src/users/dto/login-user.dto";
 import { JwtStrategy } from "./strategies/jwt.strategy";
-import { JwtRefreshStrategy } from "./strategies/jwt-refresh.strategy";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
+import { Public } from "src/skip-auth.decorator";
+import { JwtRefreshGuard } from "./guards/jwt-refresh.guard";
 
 @ApiTags("AuthApi")
 @Controller("auth")
@@ -32,12 +31,16 @@ export class AuthController {
     return await this.authService.register(createUserDto);
   }
 
-  // 이메일과 패스워드 받아서 로그인. jwt토큰에 user 정보를 받아서 json으로 리턴.
-  // UseGuards에서 이름을 참조해 passport-local패키지에서 제공하는 코드와 연결
-  // @Public()
-  @UseGuards(LocalAuthGuard)
+  /**
+   * 이메일과 패스워드 받아서 로그인
+   * 해당 유저에 해당되는 아이디 값을 통해 AccessToken과 RefreshToken을 발급, cookie에 저장하여 리턴
+   *
+   * @param body
+   * @param res
+   * @returns
+   */
+  @Public()
   @Post("/login")
-  // async login(@Request() req, @Res({ passthrough: true }) res: Response) {
   async login(@Body() body: UserLoginDto, @Res({ passthrough: true }) res: Response) {
     const payload = await this.authService.login(body);
 
@@ -48,14 +51,19 @@ export class AuthController {
     return payload;
   }
 
-  @UseGuards(JwtStrategy)
+  /**
+   * public 데코레이터의 의하여 Access Token 검증을 스킵,
+   * JwtRefreshGuard 에 의해 현재 쿠키에 있는 Refresh Token이 유효한지 확인 한 후, 유효 하다면 User 정보를 가져옵니다.
+   * @param req
+   * @param res
+   * @returns
+   */
+  @Public()
+  @UseGuards(JwtRefreshGuard)
   @Get("/logout")
   async logOut(@Req() req, @Res({ passthrough: true }) res: Response) {
-    // const { access_token, ...option } = await this.authService.logOut();
-    // res.cookie("Authentication", access_token, option);
-    console.log("5. 컨트롤러 호출 ");
-    const { accessOption, refreshOption } = this.authService.getCookiesForLogOut();
-    await this.usersService.removeRefreshToken(req.body.email);
+    // 초기화된 쿠키의 옵션을 가져와서 cookie에 담아서 초기화
+    const { accessOption, refreshOption } = await this.authService.getCookiesForLogOut(req.body.email);
 
     res.cookie("Authentication", "", accessOption);
     res.cookie("Refresh", "", refreshOption);
@@ -63,7 +71,7 @@ export class AuthController {
     return HttpStatus.OK;
   }
 
-  @UseGuards(JwtStrategy)
+  // @UseGuards(JwtStrategy)
   @Get("/refresh")
   async refresh(@Req() req, @Res({ passthrough: true }) res: Response) {
     const user = req.body;
@@ -74,20 +82,18 @@ export class AuthController {
     return user;
   }
 
-  @UseGuards(JwtStrategy)
+  // @UseGuards(JwtStrategy)
   @Get("profile")
   getProfile(@Request() req) {
     return req.user;
   }
 
-  @Public()
   @Get("google")
   @UseGuards(AuthGuard("google"))
   async googleAuth(@Req() req) {
     return;
   }
 
-  @Public()
   @Get("google/callback")
   @UseGuards(AuthGuard("google"))
   async googleAuthRedirect(@Req() req, @Res({ passthrough: true }) res: Response) {
@@ -108,7 +114,6 @@ export class AuthController {
   }
 
   // 가입 확인 인증 진행
-  @Public()
   @Post("/email-verify")
   async verifyEmail(@Query() dto: VerifyEmailDto): Promise<any> {
     const { signupVerifyToken } = dto;

@@ -4,20 +4,15 @@ import { EjsAdapter } from "@nestjs-modules/mailer/dist/adapters/ejs.adapter";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import * as path from "path";
 import { AuthModule } from "./auth/auth.module";
-import { PassportModule } from "@nestjs/passport";
-import { JwtModule } from "@nestjs/jwt";
-import { AuthService } from "./auth/auth.service";
-import { JwtAuthGuard } from "./auth/guards/jwt-auth.guard";
-import { APP_GUARD } from "@nestjs/core";
 import { LoggerMiddleware } from "./logger.middleware";
-import { join } from "path";
-import { TypeOrmModule } from "@nestjs/typeorm";
 import { Connection } from "typeorm";
 import { UsersModule } from "./users/users.module";
 import { DatabaseModule } from "./database/database.module";
 import emailConfig from "./config/email.config";
 import Joi from "@hapi/joi";
 import { EventsModule } from "./event/events.module";
+import { APP_GUARD } from "@nestjs/core";
+import { JwtAuthGuard } from "./auth/guards/jwt-auth.guard";
 
 // providers: nest injector에 의해 인스턴스화되고 모듈에서 공유되는 provider
 // controller: 인스턴스화해야하는 컨트롤러 세트
@@ -68,11 +63,13 @@ import { EventsModule } from "./event/events.module";
   /**
    * 모든 경로에 대한 접근을 제한하는 guard 설정
    */
-  // providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
+  providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
 })
-export class AppModule implements NestModule {
-  constructor(private connection: Connection) {}
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes("/users");
-  }
-}
+export class AppModule {}
+
+// export class AppModule implements NestModule {
+//   constructor(private connection: Connection) {}
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer.apply(LoggerMiddleware).forRoutes("/users");
+//   }
+// }

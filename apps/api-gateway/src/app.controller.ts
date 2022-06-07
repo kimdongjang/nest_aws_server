@@ -1,7 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
-import { zip } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { AppService } from './app.service';
+import { Controller, Get } from "@nestjs/common";
+import { zip } from "rxjs";
+import { map } from "rxjs/operators";
+import { AppService } from "./app.service";
 
 /**
  * rxjs를 사용한 이벤트 스트림(시간에 따른 스트림) 비동기 처리
@@ -13,11 +13,11 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get('/ping-a')
+  @Get("/ping-a")
   pingServiceA() {
     return this.appService.pingServiceA();
   }
-  @Get('/ping-b')
+  @Get("/ping-b")
   pingServiceB() {
     return this.appService.pingServiceB();
   }

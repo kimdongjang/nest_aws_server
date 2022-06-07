@@ -5,7 +5,6 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import * as uuid from "uuid";
 import { EmailService } from "src/email/email.service";
-import { AuthService } from "src/auth/auth.service";
 import { compare, hash } from "bcrypt";
 import { User } from "src/database/entities/User.entity";
 import { LocalAuthenticaion } from "src/database/entities/LocalAuthenticaion.entity";
@@ -23,7 +22,7 @@ export class UsersService {
     @InjectRepository(SocialAuthentication)
     private socialAuthRepository: Repository<SocialAuthentication>,
     private connection: Connection,
-    private emailService: EmailService // @Inject(JwtService) // private jwtService: JwtService
+    private emailService: EmailService
   ) {}
 
   /**
@@ -94,7 +93,8 @@ export class UsersService {
   }
 
   /**
-   * 리프레쉬 토큰이 일치하는지 확인
+   * 유저의 고유 번호를 이용하여 데이터를 조회하고 Refresh Token이 유효한지 확인
+   * DB에 저장된 토큰은 암호화가 되어있기 때문에 bcrypt의 compare 메소드를 이용하여 비교하고 일치한다면 해당 유저 정보를 반환
    * @param refreshToken
    * @param email
    * @returns

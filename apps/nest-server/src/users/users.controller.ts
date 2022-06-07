@@ -1,14 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Redirect, Query, Headers } from "@nestjs/common";
 import { UsersService } from "./users.service";
-import { CreateUserDto } from "./dto/create-user.dto";
-import { UpdateUserDto } from "./dto/update-user.dto";
 import { EmailService } from "src/email/email.service";
 import { ApiTags } from "@nestjs/swagger";
-import { VerifyEmailDto } from "src/email/dto/verify-email.dto";
-import { UserLoginDto } from "./dto/login-user.dto";
-import { AuthService } from "src/auth/auth.service";
-import { Public } from "src/skip-auth.decorator";
-import { User } from "src/database/entities/User.entity";
 
 @ApiTags("UserAPI")
 @Controller("users")

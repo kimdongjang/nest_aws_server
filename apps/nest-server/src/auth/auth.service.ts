@@ -189,8 +189,10 @@ export class AuthService {
    */
   async validateUser(email: string, plainTextPassword: string): Promise<any> {
     try {
+      console.log(email);
+      console.log(plainTextPassword);
       const user = await this.usersService.findByEmail(email);
-      await this.verifyPassword(plainTextPassword, " user.localAuth.password");
+      await this.verifyPassword(plainTextPassword, user.password);
 
       const { ...result } = user;
       return result;
@@ -306,7 +308,8 @@ export class AuthService {
    * 로그아웃시 쿠키에 빈 쿠기를 만들기 위한 값을 반환
    * @returns
    */
-  getCookiesForLogOut() {
+  async getCookiesForLogOut(email: string) {
+    await this.usersService.removeRefreshToken(email);
     return {
       accessOption: {
         domain: "localhost",
