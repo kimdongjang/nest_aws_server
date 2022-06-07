@@ -27,7 +27,7 @@ export class AuthController {
    * @param createUserDto email, username, password
    * @returns
    */
-  // @Public()
+  @Public()
   @Post("register")
   async register(@Body() createUserDto: CreateUserDto) {
     return await this.authService.register(createUserDto);
@@ -41,7 +41,7 @@ export class AuthController {
    * @param res
    * @returns
    */
-  // @Public()
+  @Public()
   @UseGuards(LocalAuthGuard)
   @Post("login")
   async login(@Body() body: UserLoginDto, @Res({ passthrough: true }) res: Response) {
@@ -62,7 +62,7 @@ export class AuthController {
    * @returns
    */
   // @Public()
-  @UseGuards(JwtRefreshGuard)
+  // @UseGuards(JwtRefreshGuard)
   @Get("logout")
   async logout(@Req() req, @Res({ passthrough: true }) res: Response) {
     // 초기화된 쿠키의 옵션을 가져와서 cookie에 담아서 초기화
@@ -74,6 +74,7 @@ export class AuthController {
     return HttpStatus.OK;
   }
 
+  @Public()
   @UseGuards(JwtRefreshGuard)
   @Get("refresh")
   async refresh(@Req() req, @Res({ passthrough: true }) res: Response) {

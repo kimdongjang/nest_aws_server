@@ -13,6 +13,8 @@ import Joi from "@hapi/joi";
 import { EventsModule } from "./event/events.module";
 import { APP_GUARD } from "@nestjs/core";
 import { JwtAuthGuard } from "./auth/guards/jwt-auth.guard";
+import { BoardsService } from "./boards/boards.service";
+import { BoardsController } from "./boards/boards.controller";
 
 // providers: nest injector에 의해 인스턴스화되고 모듈에서 공유되는 provider
 // controller: 인스턴스화해야하는 컨트롤러 세트
@@ -63,7 +65,8 @@ import { JwtAuthGuard } from "./auth/guards/jwt-auth.guard";
   /**
    * 모든 경로에 대한 접근을 제한하는 guard 설정
    */
-  // providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
+  providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }, BoardsService],
+  controllers: [BoardsController],
 })
 export class AppModule {}
 
