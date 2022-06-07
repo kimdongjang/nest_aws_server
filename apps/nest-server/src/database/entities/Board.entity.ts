@@ -16,7 +16,7 @@ export class Board {
   updateAt: Date;
 
   @ManyToOne(() => User, user => user.email)
-  @JoinColumn()
+  // @JoinColumn()
   @PrimaryColumn("varchar", { primary: true, name: "email", length: 255, unique: true })
   email: string;
 }

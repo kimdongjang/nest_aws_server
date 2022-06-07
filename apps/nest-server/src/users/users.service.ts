@@ -23,7 +23,7 @@ export class UsersService {
     private socialAuthRepository: Repository<SocialAuthentication>,
     private connection: Connection,
     private emailService: EmailService
-  ) {}
+  ) { }
 
   /**
    * 유저 데이터 생성
@@ -167,7 +167,7 @@ export class UsersService {
     throw new HttpException("User with this email does not exist", HttpStatus.NOT_FOUND);
   }
   async findBySignupVerifyToken(signupVerifyToken: string): Promise<User | undefined> {
-    const user = this.usersRepository.findOne({
+    const user = await this.usersRepository.findOne({
       where: { signupVerifyToken: signupVerifyToken },
     });
     if (user) {

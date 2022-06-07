@@ -12,7 +12,7 @@ import { JwtService, JwtVerifyOptions } from "@nestjs/jwt";
 // 유효한 jwt를 가지고 있는 request만 접근할 수 있는 protected routes를 생성
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService, private usersService: UsersService, private configService: ConfigService) {}
+  constructor(private jwtService: JwtService, private usersService: UsersService, private configService: ConfigService) { }
 
   /**
    * 구글로 로그인했을시의 서비스
@@ -224,7 +224,52 @@ export class AuthService {
       throw new NotFoundException("유저가 존재하지 않습니다");
     }
     // 2. 바로 로그인 상태가 되도록 JWT를 발급
-    return this.login(user);
+
+    try {
+      const accessToken = this.jwtService.sign(
+        { user: user },
+        {
+          secret: this.configService.get("JWT_ACCESS_TOKEN_SECRET"),
+          expiresIn: Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")),
+        }
+      );
+
+      const refreshToken = this.jwtService.sign(
+        { user: user },
+        {
+          secret: this.configService.get("JWT_REFRESH_TOKEN__SECRET"),
+          expiresIn: Number(this.configService.get("JWT_REFRESH_TOKEN_EXPIRATION_TIME")),
+        }
+      );
+      await this.usersService.setCurrentRefreshToken(refreshToken, user.email);
+
+      return {
+        // access_token: this.jwtService.sign(JSON.stringify(payload), this.configService.get("JWT_ACCESS_TOKEN_SECRET")),
+        domain: this.configService.get("DOMAIN"),
+        path: "/",
+        httpOnly: true,
+        maxAge: Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME") * 1000),
+        status: HttpStatus.ACCEPTED,
+        data: user,
+        error: "",
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      };
+    }
+    catch {
+      return {
+        // access_token: this.jwtService.sign(JSON.stringify(payload), this.configService.get("JWT_ACCESS_TOKEN_SECRET")),
+        domain: this.configService.get("DOMAIN"),
+        path: "/",
+        httpOnly: true,
+        maxAge: Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME") * 1000),
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        data: user,
+        error: "토큰 발급에 실패하였습니다.",
+        accessToken: null,
+        refreshToken: null,
+      };
+    }
   }
 
   /**

@@ -16,9 +16,9 @@ import { join } from "path";
         password: configService.get("DATABASE_PASSWORD"),
         database: configService.get("DATABASE_NAME"),
         entities: [join(__dirname, "/../**/*.entity.js")],
-        synchronize: configService.get("DATABASE_SYNCHRONIZE"),
+        // synchronize: configService.get("DATABASE_SYNCHRONIZE"),
       }),
     }),
   ],
 })
-export class DatabaseModule {}
+export class DatabaseModule { }

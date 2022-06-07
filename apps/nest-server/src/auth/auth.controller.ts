@@ -20,7 +20,7 @@ import { JwtRefreshStrategy } from "./strategies/jwt-refresh.strategy";
 @ApiTags("AuthApi")
 @Controller("auth")
 export class AuthController {
-  constructor(private authService: AuthService, private usersService: UsersService) {}
+  constructor(private authService: AuthService, private usersService: UsersService) { }
 
   /**
    * 회원 가입
@@ -118,6 +118,7 @@ export class AuthController {
   }
 
   // 가입 확인 인증 진행
+  @Public()
   @Post("/email-verify")
   async verifyEmail(@Query() dto: VerifyEmailDto): Promise<any> {
     const { signupVerifyToken } = dto;

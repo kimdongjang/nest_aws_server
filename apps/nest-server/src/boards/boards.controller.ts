@@ -5,15 +5,11 @@ import { BoardWriteDto } from "./dto/board-write.dto";
 
 @Controller("boards")
 export class BoardsController {
-  constructor(private boardService: BoardService) {}
+  constructor(private readonly boardService: BoardService) { }
 
   @Post("/write")
-  async writeBoard(@Body() body: BoardWriteDto, @Res({ passthrough: true }) res: Response) {
+  async writeBoard(@Body() body: BoardWriteDto) {
     const payload = await this.boardService.createBoard(body);
-
-    // 쿠키에 jwt토큰과 refresh 토큰을 저장
-    // res.cookie("Authentication", payload.accessToken);
-    // res.cookie("Refresh", payload.refreshToken);
 
     return payload;
   }
