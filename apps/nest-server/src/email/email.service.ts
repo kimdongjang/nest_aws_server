@@ -1,7 +1,7 @@
 import { MailerService } from "@nestjs-modules/mailer";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import Mail from "nodemailer/lib/mailer";
-import { AuthService } from "src/auth/service/auth.service";
+import { AuthService } from "src/auth/auth.service";
 import { Repository } from "typeorm";
 
 @Injectable()

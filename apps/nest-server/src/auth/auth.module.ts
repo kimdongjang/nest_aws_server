@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { PassportModule } from "@nestjs/passport";
-import { AuthService } from "./service/auth.service";
+import { AuthService } from "./auth.service";
 import { AuthController } from "./auth.controller";
 import { JwtModule } from "@nestjs/jwt";
 import { APP_GUARD } from "@nestjs/core";
@@ -31,7 +31,7 @@ import { JwtRefreshStrategy } from "./strategies/jwt-refresh.strategy";
     UsersModule,
     ConfigModule,
   ],
-  providers: [AuthService, JwtStrategy, GoogleStrategy, JwtRefreshStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy, JwtRefreshStrategy],
   exports: [AuthService, JwtModule],
   controllers: [AuthController],
 })

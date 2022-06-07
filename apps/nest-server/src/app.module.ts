@@ -6,7 +6,7 @@ import * as path from "path";
 import { AuthModule } from "./auth/auth.module";
 import { PassportModule } from "@nestjs/passport";
 import { JwtModule } from "@nestjs/jwt";
-import { AuthService } from "./auth/service/auth.service";
+import { AuthService } from "./auth/auth.service";
 import { JwtAuthGuard } from "./auth/guards/jwt-auth.guard";
 import { APP_GUARD } from "@nestjs/core";
 import { LoggerMiddleware } from "./logger.middleware";
@@ -65,7 +65,10 @@ import { EventsModule } from "./event/events.module";
     DatabaseModule,
     EventsModule,
   ],
-  providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
+  /**
+   * 모든 경로에 대한 접근을 제한하는 guard 설정
+   */
+  // providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
 })
 export class AppModule implements NestModule {
   constructor(private connection: Connection) {}

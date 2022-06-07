@@ -5,7 +5,7 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import * as uuid from "uuid";
 import { EmailService } from "src/email/email.service";
-import { AuthService } from "src/auth/service/auth.service";
+import { AuthService } from "src/auth/auth.service";
 import { compare, hash } from "bcrypt";
 import { User } from "src/database/entities/User.entity";
 import { LocalAuthenticaion } from "src/database/entities/LocalAuthenticaion.entity";
@@ -85,7 +85,6 @@ export class UsersService {
    */
   async setCurrentRefreshToken(refreshToken: string, email: string) {
     const currentHashedRefreshToken = await this.setHashToken(refreshToken);
-    console.log(currentHashedRefreshToken);
     await this.usersRepository.update(
       { email: email },
       {
@@ -110,6 +109,19 @@ export class UsersService {
       return user;
     }
   }
+  /**
+   * 로그아웃 시 리프레쉬 토큰 삭제
+   * @param id
+   * @returns
+   */
+  async removeRefreshToken(email: string) {
+    return this.usersRepository.update(
+      { email: email },
+      {
+        currentHashedRefreshToken: null,
+      }
+    );
+  }
 
   /**
    *  유저 패스워드가 유효한지 확인함
@@ -133,20 +145,6 @@ export class UsersService {
 
   public async setHashToken(token: string) {
     return hash(token, 10);
-  }
-
-  /**
-   *
-   * @param id
-   * @returns
-   */
-  async removeRefreshToken(email: string) {
-    return this.usersRepository.update(
-      { email: email },
-      {
-        currentHashedRefreshToken: null,
-      }
-    );
   }
 
   async findAll() {

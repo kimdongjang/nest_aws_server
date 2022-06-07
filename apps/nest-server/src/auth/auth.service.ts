@@ -255,25 +255,25 @@ export class AuthService {
    * @returns
    */
   async getCookieWithJwtAccessToken(email: string) {
-    // const payload = { email };
-    const payload = await this.usersService.findByEmail(email);
-    return this.login(payload);
+    const payload = { email };
+    // const payload = await this.usersService.findByEmail(email);
+    // return this.login(payload);
 
-    // const token = this.jwtService.sign(
-    //   { payload },
-    //   {
-    //     secret: this.configService.get("JWT_ACCESS_TOKEN_SECRET"),
-    //     expiresIn: `${this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")}s`,
-    //   }
-    // );
+    const token = this.jwtService.sign(
+      { payload },
+      {
+        secret: this.configService.get("JWT_ACCESS_TOKEN_SECRET"),
+        expiresIn: `${this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")}s`,
+      }
+    );
 
-    // return {
-    //   accessToken: token,
-    //   domain: "localhost",
-    //   path: "/",
-    //   httpOnly: true,
-    //   maxAge: Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")) * 1000,
-    // };
+    return {
+      accessToken: token,
+      domain: "localhost",
+      path: "/",
+      httpOnly: true,
+      maxAge: Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")),
+    };
   }
 
   /**
@@ -282,10 +282,11 @@ export class AuthService {
    * @returns
    */
   async getCookieWithJwtRefreshToken(email: string) {
-    const user = await this.usersService.findByEmail(email);
+    const payload = { email };
+    // const user = await this.usersService.findByEmail(email);
 
     const refreshToken = this.jwtService.sign(
-      { user: user },
+      { payload },
       {
         secret: this.configService.get("JWT_REFRESH_TOKEN__SECRET"),
         expiresIn: Number(this.configService.get("JWT_REFRESH_TOKEN_EXPIRATION_TIME")),
@@ -297,7 +298,7 @@ export class AuthService {
       domain: "localhost",
       path: "/",
       httpOnly: true,
-      maxAge: Number(this.configService.get("JWT_REFRESH_TOKEN_EXPIRATION_TIME")) * 1000,
+      maxAge: Number(this.configService.get("JWT_REFRESH_TOKEN_EXPIRATION_TIME")),
     };
   }
 

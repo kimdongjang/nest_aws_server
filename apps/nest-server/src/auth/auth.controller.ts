@@ -6,7 +6,7 @@ import { VerifyEmailDto } from "src/email/dto/verify-email.dto";
 import { Public } from "src/skip-auth.decorator";
 import { CreateUserDto } from "src/users/dto/create-user.dto";
 import { UsersService } from "src/users/users.service";
-import { AuthService } from "./service/auth.service";
+import { AuthService } from "./auth.service";
 import { CustomGuard } from "./guards/custom.guard";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { JwtRefreshGuard } from "./guards/jwt-refresh.guard";
@@ -14,6 +14,7 @@ import { User } from "src/database/entities/User.entity";
 import { UserLoginDto } from "src/users/dto/login-user.dto";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { JwtRefreshStrategy } from "./strategies/jwt-refresh.strategy";
+import { LocalAuthGuard } from "./guards/local-auth.guard";
 
 @ApiTags("AuthApi")
 @Controller("auth")
@@ -25,7 +26,7 @@ export class AuthController {
    * @param createUserDto email, username, password
    * @returns
    */
-  @Public()
+  // @Public()
   @Post("/register")
   async register(@Body() createUserDto: CreateUserDto) {
     return await this.authService.register(createUserDto);
@@ -33,8 +34,8 @@ export class AuthController {
 
   // 이메일과 패스워드 받아서 로그인. jwt토큰에 user 정보를 받아서 json으로 리턴.
   // UseGuards에서 이름을 참조해 passport-local패키지에서 제공하는 코드와 연결
-  // @UseGuards(AuthGuard("local"))
-  @Public()
+  // @Public()
+  @UseGuards(LocalAuthGuard)
   @Post("/login")
   // async login(@Request() req, @Res({ passthrough: true }) res: Response) {
   async login(@Body() body: UserLoginDto, @Res({ passthrough: true }) res: Response) {

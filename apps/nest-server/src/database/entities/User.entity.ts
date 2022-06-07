@@ -23,6 +23,8 @@ export class User {
   isactive: boolean;
   @Column()
   signupVerifyToken: string;
+
+  // 로그아웃시 Refresh Token Null처리
   @Column({ nullable: true })
   currentHashedRefreshToken?: string;
 }
