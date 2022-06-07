@@ -14,6 +14,8 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { Public } from "src/skip-auth.decorator";
 import { JwtRefreshGuard } from "./guards/jwt-refresh.guard";
+import { JwtAuthGuard } from "./guards/jwt-auth.guard";
+import { JwtRefreshStrategy } from "./strategies/jwt-refresh.strategy";
 
 @ApiTags("AuthApi")
 @Controller("auth")
@@ -26,7 +28,7 @@ export class AuthController {
    * @returns
    */
   // @Public()
-  @Post("/register")
+  @Post("register")
   async register(@Body() createUserDto: CreateUserDto) {
     return await this.authService.register(createUserDto);
   }
@@ -39,8 +41,9 @@ export class AuthController {
    * @param res
    * @returns
    */
-  @Public()
-  @Post("/login")
+  // @Public()
+  @UseGuards(LocalAuthGuard)
+  @Post("login")
   async login(@Body() body: UserLoginDto, @Res({ passthrough: true }) res: Response) {
     const payload = await this.authService.login(body);
 
@@ -58,10 +61,10 @@ export class AuthController {
    * @param res
    * @returns
    */
-  @Public()
+  // @Public()
   @UseGuards(JwtRefreshGuard)
-  @Get("/logout")
-  async logOut(@Req() req, @Res({ passthrough: true }) res: Response) {
+  @Get("logout")
+  async logout(@Req() req, @Res({ passthrough: true }) res: Response) {
     // 초기화된 쿠키의 옵션을 가져와서 cookie에 담아서 초기화
     const { accessOption, refreshOption } = await this.authService.getCookiesForLogOut(req.body.email);
 
@@ -71,8 +74,8 @@ export class AuthController {
     return HttpStatus.OK;
   }
 
-  // @UseGuards(JwtStrategy)
-  @Get("/refresh")
+  @UseGuards(JwtRefreshGuard)
+  @Get("refresh")
   async refresh(@Req() req, @Res({ passthrough: true }) res: Response) {
     const user = req.body;
     console.log(user);

@@ -7,7 +7,7 @@ import { Strategy } from "passport-jwt";
 import { UsersService } from "src/users/users.service";
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
+export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly configService: ConfigService, private readonly usersService: UsersService, private readonly jwtService: JwtService) {
     super({
       // jwt 추출 방법 제공(Request의 Authorization 헤더에 토큰 제공)

@@ -63,7 +63,7 @@ import { JwtAuthGuard } from "./auth/guards/jwt-auth.guard";
   /**
    * 모든 경로에 대한 접근을 제한하는 guard 설정
    */
-  providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
+  // providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
 })
 export class AppModule {}
 

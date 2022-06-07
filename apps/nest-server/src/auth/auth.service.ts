@@ -189,8 +189,6 @@ export class AuthService {
    */
   async validateUser(email: string, plainTextPassword: string): Promise<any> {
     try {
-      console.log(email);
-      console.log(plainTextPassword);
       const user = await this.usersService.findByEmail(email);
       await this.verifyPassword(plainTextPassword, user.password);
 
