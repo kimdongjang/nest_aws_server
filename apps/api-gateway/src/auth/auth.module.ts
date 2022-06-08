@@ -5,18 +5,18 @@ import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 
 @Module({
-  imports: [ClientsModule.register([
-    {
-      name: AUTH_SERVICE_NAME,
-      transport: Transport.TCP,
-      options: {
-        url: '0.0.0.0:50051',
-        package: AUTH_PACKAGE_NAME,
-        protoPath: 'node_modules/grpc-nest-proto/proto/auth.proto',
+  imports: [
+    ClientsModule.register([
+      {
+        name: "AUTH_SERVICE",
+        transport: Transport.TCP,
+        options: {
+          url: "0.0.0.0:50001",
+        },
       },
-    },
-  ]),],
+    ]),
+  ],
   controllers: [AuthController],
   providers: [AuthService],
 })
-export class AuthModule { }
+export class AuthModule {}

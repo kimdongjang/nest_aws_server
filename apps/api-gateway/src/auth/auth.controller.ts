@@ -3,31 +3,22 @@ import { ClientGrpc } from "@nestjs/microservices";
 import { AuthGuard } from "@nestjs/passport";
 import { Observable } from "rxjs";
 import { AuthServiceClient, AUTH_SERVICE_NAME, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from "./auth.pb";
+import { AuthService } from "./auth.service";
 
 @Controller("auth")
-export class AuthController implements OnModuleInit {
-  private svc: AuthServiceClient;
-  @Inject(AUTH_SERVICE_NAME)
-  private readonly client: ClientGrpc;
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
 
-  onModuleInit(): void {
-    this.svc = this.client.getService<AuthServiceClient>(AUTH_SERVICE_NAME);
+  @Post("Register")
+  private async register(@Body() body) {
+    return this.authService.register(body);
   }
-
-  @Post('Register')
-  private async register(
-    @Body() body: RegisterRequest,
-  ): Promise<Observable<RegisterResponse>> {
-    return this.svc.register(body);
+  @Post("login")
+  private async login(@Body() body) {
+    return this.authService.login(body);
   }
-  @Post('login')
-  private async login(
-    @Body() body: LoginRequest,
-  ): Promise<Observable<LoginResponse>> {
-    return this.svc.login(body);
-  }
-  @Post('logout')
-  private async logout(): Promise<Observable<LoginResponse>> {
-    return this.svc.logout();
+  @Post("logout")
+  private async logout() {
+    return this.authService.logout();
   }
 }
