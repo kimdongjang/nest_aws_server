@@ -1,4 +1,10 @@
-# docker_nest_test
+# nest_aws_server
+
+## MicroService Test 구조
+service-client-nest: 5682  
+mq-server-nest: 5672  
+
+```localhost:5682/hello/john```접근 -> 5682 컨트롤러에서 5672의 컨트롤러로 전달, 5672의 서비스 실행  
 
 ## AWS Docker, Jenkins 도커 자동배포 구조
 
