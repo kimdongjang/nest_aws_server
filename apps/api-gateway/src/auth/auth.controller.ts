@@ -11,14 +11,14 @@ export class AuthController {
 
   @Post("Register")
   private async register(@Body() body) {
-    return this.authService.register(body);
+    // return this.authService.register(body);
   }
   @Post("login")
   private async login(@Body() body) {
-    return this.authService.login(body);
+    // return this.authService.login(body);
   }
   @Post("logout")
   private async logout() {
-    return this.authService.logout();
+    // return this.authService.logout();
   }
 }

@@ -17,6 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromExtractors([
         request => {
           try {
+            console.log("JwtStrategy : " + request?.cookies?.Authentication);
             return request?.cookies?.Authentication;
           } catch (error) {
             throw new HttpException("Not Found your email", HttpStatus.NOT_FOUND);

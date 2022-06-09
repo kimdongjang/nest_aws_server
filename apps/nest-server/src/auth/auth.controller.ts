@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Param, Post, Query, Req, Request, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, Req, Request, Res, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
@@ -15,12 +15,11 @@ import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { Public } from "src/skip-auth.decorator";
 import { JwtRefreshGuard } from "./guards/jwt-refresh.guard";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
-import { JwtRefreshStrategy } from "./strategies/jwt-refresh.strategy";
 
 @ApiTags("AuthApi")
 @Controller("auth")
 export class AuthController {
-  constructor(private authService: AuthService, private usersService: UsersService) { }
+  constructor(private authService: AuthService, private usersService: UsersService) {}
 
   /**
    * 회원 가입
@@ -61,9 +60,10 @@ export class AuthController {
    * @param res
    * @returns
    */
-  // @Public()
-  // @UseGuards(JwtRefreshGuard)
-  @Get("logout")
+  @Public()
+  @UseGuards(JwtRefreshGuard)
+  @Post("logout")
+  @HttpCode(HttpStatus.OK)
   async logout(@Req() req, @Res({ passthrough: true }) res: Response) {
     // 초기화된 쿠키의 옵션을 가져와서 cookie에 담아서 초기화
     const { accessOption, refreshOption } = await this.authService.getCookiesForLogOut(req.body.email);
@@ -80,10 +80,11 @@ export class AuthController {
   async refresh(@Req() req, @Res({ passthrough: true }) res: Response) {
     const user = req.body;
     console.log(user);
-    const { accessToken: access_token, ...accessOption } = await this.authService.login(user.email);
-    res.cookie("Authentication", access_token);
 
-    return user;
+    // const { accessToken: access_token, ...accessOption } = await this.authService.login(user.email);
+    res.cookie("Authentication", await this.authService.getCookieWithJwtAccessToken(user.email));
+
+    return HttpStatus.OK;
   }
 
   // @UseGuards(JwtStrategy)

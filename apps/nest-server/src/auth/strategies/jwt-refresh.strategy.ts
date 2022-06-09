@@ -1,13 +1,15 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { ForbiddenException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
 import { Request } from "express";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { User } from "src/database/entities/User.entity";
 import { UsersService } from "src/users/users.service";
+import { JwtPayload } from "../types/jwtPayload.type";
+import { JwtPayloadWithRt } from "../types/jwtPayloadWithRt.type";
 
 @Injectable()
-export class JwtRefreshStrategy extends PassportStrategy(Strategy, "jwt-refresh-token") {
+export class JwtRefreshStrategy extends PassportStrategy(Strategy, "jwt-refresh") {
   constructor(private readonly configService: ConfigService, private readonly usersService: UsersService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -25,8 +27,32 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, "jwt-refresh-
   }
 
   async validate(request: Request, payload: any) {
-    console.log("refresh");
+    console.log("validate");
+    console.log(payload);
     const refreshToken = request.cookies?.Refresh;
-    return this.usersService.getUserIfRefreshTokenMatches(refreshToken, payload.email);
+    return await this.usersService.getUserIfRefreshTokenMatches(refreshToken, payload.user.email);
   }
 }
+
+// @Injectable()
+// export class JwtRefreshStrategy extends PassportStrategy(Strategy, "jwt-refresh") {
+//   constructor(configService: ConfigService) {
+//     super({
+//       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+//       secretOrKey: configService.get("JWT_REFRESH_TOKEN_SECRET"),
+//       passReqToCallback: true,
+//     });
+//   }
+
+//   validate(req: Request, payload: JwtPayload): JwtPayloadWithRt {
+//     console.log("validate");
+//     const refreshToken = req?.get("authorization")?.replace("Bearer", "").trim();
+
+//     if (!refreshToken) throw new ForbiddenException("Refresh token malformed");
+
+//     return {
+//       ...payload,
+//       refreshToken,
+//     };
+//   }
+// }

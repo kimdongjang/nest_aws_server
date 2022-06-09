@@ -23,7 +23,7 @@ export class UsersService {
     private socialAuthRepository: Repository<SocialAuthentication>,
     private connection: Connection,
     private emailService: EmailService
-  ) { }
+  ) {}
 
   /**
    * 유저 데이터 생성
@@ -101,7 +101,6 @@ export class UsersService {
    */
   async getUserIfRefreshTokenMatches(refreshToken: string, email: string) {
     const user = await this.findByEmail(email);
-    console.log(user);
 
     const isRefreshTokenMatching = await compare(refreshToken, user.currentHashedRefreshToken);
 

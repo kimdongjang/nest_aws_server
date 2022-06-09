@@ -12,7 +12,7 @@ import { JwtService, JwtVerifyOptions } from "@nestjs/jwt";
 // 유효한 jwt를 가지고 있는 request만 접근할 수 있는 protected routes를 생성
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService, private usersService: UsersService, private configService: ConfigService) { }
+  constructor(private jwtService: JwtService, private usersService: UsersService, private configService: ConfigService) {}
 
   /**
    * 구글로 로그인했을시의 서비스
@@ -147,7 +147,7 @@ export class AuthService {
     const refreshToken = this.jwtService.sign(
       { user: user },
       {
-        secret: this.configService.get("JWT_REFRESH_TOKEN__SECRET"),
+        secret: this.configService.get<string>("JWT_REFRESH_TOKEN_SECRET"),
         expiresIn: Number(this.configService.get("JWT_REFRESH_TOKEN_EXPIRATION_TIME")),
       }
     );
@@ -237,7 +237,7 @@ export class AuthService {
       const refreshToken = this.jwtService.sign(
         { user: user },
         {
-          secret: this.configService.get("JWT_REFRESH_TOKEN__SECRET"),
+          secret: this.configService.get("JWT_REFRESH_TOKEN_SECRET"),
           expiresIn: Number(this.configService.get("JWT_REFRESH_TOKEN_EXPIRATION_TIME")),
         }
       );
@@ -255,8 +255,7 @@ export class AuthService {
         accessToken: accessToken,
         refreshToken: refreshToken,
       };
-    }
-    catch {
+    } catch {
       return {
         // access_token: this.jwtService.sign(JSON.stringify(payload), this.configService.get("JWT_ACCESS_TOKEN_SECRET")),
         domain: this.configService.get("DOMAIN"),
@@ -333,7 +332,7 @@ export class AuthService {
     const refreshToken = this.jwtService.sign(
       { payload },
       {
-        secret: this.configService.get("JWT_REFRESH_TOKEN__SECRET"),
+        secret: this.configService.get("JWT_REFRESH_TOKEN_SECRET"),
         expiresIn: Number(this.configService.get("JWT_REFRESH_TOKEN_EXPIRATION_TIME")),
       }
     );

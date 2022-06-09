@@ -15,7 +15,9 @@ import { APP_GUARD } from "@nestjs/core";
 import { JwtAuthGuard } from "./auth/guards/jwt-auth.guard";
 import { BoardsService } from "./boards/boards.service";
 import { BoardsController } from "./boards/boards.controller";
-import { BoardsModule } from './boards/boards.module';
+import { BoardsModule } from "./boards/boards.module";
+import * as winston from "winston";
+import { utilities as nestWinstonModuleUtilities, WinstonModule } from "nest-winston";
 
 // providers: nest injector에 의해 인스턴스화되고 모듈에서 공유되는 provider
 // controller: 인스턴스화해야하는 컨트롤러 세트
@@ -26,6 +28,7 @@ import { BoardsModule } from './boards/boards.module';
     // 동적 모듈 = ConfigModule의 forRoot 메서드는 DynamicModule을 리턴하는 정적 메서드임
     ConfigModule.forRoot({
       isGlobal: true,
+
       load: [emailConfig],
       envFilePath: process.env.NODE_ENV === "production" ? ".production.env" : ".development.env",
       validationSchema: Joi.object({
@@ -58,6 +61,14 @@ import { BoardsModule } from './boards/boards.module';
         };
       },
     }),
+    WinstonModule.forRoot({
+      transports: [
+        new winston.transports.Console({
+          level: process.env.NODE_ENV === "production" ? "info" : "silly",
+          format: winston.format.combine(winston.format.timestamp(), nestWinstonModuleUtilities.format.nestLike("MyApp", { prettyPrint: true })),
+        }),
+      ],
+    }),
     AuthModule,
     UsersModule,
     DatabaseModule,
@@ -70,7 +81,7 @@ import { BoardsModule } from './boards/boards.module';
   providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
   controllers: [BoardsController],
 })
-export class AppModule { }
+export class AppModule {}
 
 // export class AppModule implements NestModule {
 //   constructor(private connection: Connection) {}
