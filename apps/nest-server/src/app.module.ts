@@ -18,6 +18,7 @@ import { BoardsController } from "./boards/boards.controller";
 import { BoardsModule } from "./boards/boards.module";
 import * as winston from "winston";
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from "nest-winston";
+import { RedisModule } from './redis/redis.module';
 
 // providers: nest injector에 의해 인스턴스화되고 모듈에서 공유되는 provider
 // controller: 인스턴스화해야하는 컨트롤러 세트
@@ -74,6 +75,7 @@ import { utilities as nestWinstonModuleUtilities, WinstonModule } from "nest-win
     DatabaseModule,
     EventsModule,
     BoardsModule,
+    RedisModule,
   ],
   /**
    * 모든 경로에 대한 접근을 제한하는 guard 설정

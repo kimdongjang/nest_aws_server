@@ -21,6 +21,15 @@ services:
     networks:
       - corp
     restart: on-failure
+  redis-server:
+    container_name: redis-server
+    image: redis:latest
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server
+
+
 
   #nextjs:
   #  build:
