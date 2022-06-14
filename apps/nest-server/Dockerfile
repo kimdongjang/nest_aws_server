@@ -16,4 +16,4 @@ WORKDIR /nest-server
 COPY --from=builder /nest-server/builder ./
 # ENV NODE_ENV=$NODE_ENV
 
-CMD ["node", "./dist/main.js"]
+CMD ["npm", "run", "start:production"]

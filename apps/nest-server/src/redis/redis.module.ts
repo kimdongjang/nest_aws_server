@@ -17,7 +17,7 @@ import { RedisController } from "./redis.controller";
     CacheModule.registerAsync({
       useFactory: async () => ({
         store: redisStore,
-        host: "127.0.0.1",
+        host: process.env.DOMAIN,
         port: 6379,
       }),
     }),
