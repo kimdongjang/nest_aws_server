@@ -14,10 +14,10 @@ services:
         NODE_ENV: "development"
         BUILD_FLAG: ""
     ports:
-      - 4939:4939
+      - 4949:4949
     environment:
       NODE_ENV: "development"
-      PORT: 4939
+      PORT: 4949
     networks:
       - corp
     restart: on-failure
