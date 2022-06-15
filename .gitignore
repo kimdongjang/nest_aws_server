@@ -36,5 +36,5 @@ lerna-debug.log*
 
 
 # .env
-/app/nest-server/.development.env
-/app/nest-server/.production.env
+/apps/nest-server/.development.env
+/apps/nest-server/.production.env
