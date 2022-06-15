@@ -34,7 +34,3 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
-
-# .env
-/apps/nest-server/.development.env
-/apps/nest-server/.production.env
