@@ -7,7 +7,7 @@ import { Repository } from "typeorm";
 @Injectable()
 export class EmailService {
   private transporter: Mail; // 이메일을 전송하기 위한 노드 메일러 사용
-  constructor(private readonly mailerService: MailerService) {}
+  constructor(private readonly mailerService: MailerService) { }
 
   async _send(
     tos: string[],
@@ -30,7 +30,7 @@ export class EmailService {
     emailAddress: string,
     signupVerifyToken: string
   ) {
-    const baseUrl = "http://localhost:4939"; // TODO: config
+    const baseUrl = "http://localhost:4949"; // TODO: config
     const url = `${baseUrl}/auth/email-verify?signupVerifyToken=${signupVerifyToken}`;
 
     await this._send([emailAddress], "[nest] 가입 확인 메일", "signin.ejs", {
