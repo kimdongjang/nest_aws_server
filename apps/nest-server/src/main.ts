@@ -24,6 +24,8 @@ async function bootstrap() {
   // 전역으로 Guard를 적용하려면
   //app.useGlobalGuards(new AuthGuard());
 
+  app.enableCors();
+
   await app.listen(4949);
 }
 bootstrap();

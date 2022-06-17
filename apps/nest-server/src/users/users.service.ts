@@ -62,9 +62,6 @@ export class UsersService {
       await queryRunner.manager.save(localAuth);
 
       await queryRunner.commitTransaction();
-
-      // 가입 확인 메일 전송
-      await this.emailService.sendMemberJoinVerification(email, signupVerifyToken);
     } catch (e) {
       console.log(e);
       await queryRunner.rollbackTransaction();
@@ -72,6 +69,14 @@ export class UsersService {
     } finally {
       // 직접 생성한 queryRunner는 해제해주어야 함.
       await queryRunner.release();
+    }
+
+    try {
+      // 가입 확인 메일 전송
+      await this.emailService.sendMemberJoinVerification(email, signupVerifyToken);
+    } catch (e) {
+      console.log(e);
+      throw new UnprocessableEntityException("가입 확인 이메일 발송 중 오류");
     }
 
     return user;

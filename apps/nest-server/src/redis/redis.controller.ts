@@ -10,8 +10,9 @@ export class RedisController {
   @Post("/visit")
   async visit(): Promise<number> {
     let count: number = await this.cacheManager.get("visitor");
+    console.log("레디스 호출");
 
-    await this.cacheManager.set("visitor", ++count, { ttl: 86400 });
+    await this.cacheManager.set("visitor", ++count, { ttl: 1000 });
 
     return count;
   }

@@ -81,22 +81,18 @@ export class AuthService {
    * @returns
    */
   async register(userData: CreateUserDto) {
-    try {
-      const user = await this.usersService.createUser(userData);
-      if (!user) {
-        return {
-          domain: this.configService.get("DOMAIN"),
-          path: "/",
-          httpOnly: true,
-          maxAge: 0,
-          status: HttpStatus.CREATED,
-          data: null,
-          accessToken: null,
-          refreshToken: null,
-        };
-      }
-    } catch (error) {
-      throw new UnprocessableEntityException("User with that email already exits");
+    const user = await this.usersService.createUser(userData);
+    if (!user) {
+      return {
+        domain: this.configService.get("DOMAIN"),
+        path: "/",
+        httpOnly: true,
+        maxAge: 0,
+        status: HttpStatus.CREATED,
+        data: null,
+        accessToken: null,
+        refreshToken: null,
+      };
     }
   }
 
