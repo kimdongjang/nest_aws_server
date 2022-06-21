@@ -8,7 +8,7 @@ export class Board {
   id: number;
   @Column()
   title: string;
-  @Column()
+  @Column({ type: "blob", width: 50000 })
   content: string;
   @CreateDateColumn()
   createAt: Date;
@@ -17,6 +17,6 @@ export class Board {
 
   @ManyToOne(() => User, user => user.email)
   // @JoinColumn()
-  @PrimaryColumn("varchar", { primary: true, name: "email", length: 255, unique: true })
+  @PrimaryColumn("varchar", { primary: true, length: 255, unique: true })
   email: string;
 }
