@@ -89,12 +89,14 @@ export class UsersService {
    */
   async setCurrentRefreshToken(refreshToken: string, email: string) {
     const currentHashedRefreshToken = await this.setHashToken(refreshToken);
+    console.log(currentHashedRefreshToken);
     await this.usersRepository.update(
       { email: email },
       {
         currentHashedRefreshToken: currentHashedRefreshToken,
       }
     );
+    return currentHashedRefreshToken;
   }
 
   /**

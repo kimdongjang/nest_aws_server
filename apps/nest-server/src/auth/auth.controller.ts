@@ -26,7 +26,6 @@ export class AuthController {
    * @param createUserDto email, username, password
    * @returns
    */
-  @Public()
   @Post("register")
   async register(@Body() createUserDto: CreateUserDto) {
     return await this.authService.register(createUserDto);
@@ -40,7 +39,6 @@ export class AuthController {
    * @param res
    * @returns
    */
-  @Public()
   @UseGuards(LocalAuthGuard)
   @Post("login")
   async login(@Body() body: UserLoginDto, @Res({ passthrough: true }) res: Response) {
@@ -54,13 +52,11 @@ export class AuthController {
   }
 
   /**
-   * public 데코레이터의 의하여 Access Token 검증을 스킵,
    * JwtRefreshGuard 에 의해 현재 쿠키에 있는 Refresh Token이 유효한지 확인 한 후, 유효 하다면 User 정보를 가져옵니다.
    * @param req
    * @param res
    * @returns
    */
-  @Public()
   @UseGuards(JwtRefreshGuard)
   @Post("logout")
   @HttpCode(HttpStatus.OK)
@@ -74,23 +70,31 @@ export class AuthController {
     return HttpStatus.OK;
   }
 
-  @Public()
+  /**
+   * 리프레시 토큰의 역할 : 액세스 토큰의 갱신 주기가 짧기 때문에 리프레시 토큰을 이용해서 토큰이 일치하면 유저의 정보를 가져오고
+   * 액세스 토큰을 다시 쿠키에 추가한다.
+   * @param req
+   * @param res
+   * @returns
+   */
   @UseGuards(JwtRefreshGuard)
   @Get("refresh")
   async refresh(@Req() req, @Res({ passthrough: true }) res: Response) {
-    const user = req.body;
-    console.log(user);
-
     // const { accessToken: access_token, ...accessOption } = await this.authService.login(user.email);
-    res.cookie("Authentication", await this.authService.getCookieWithJwtAccessToken(user.email));
+    const payload = await this.authService.getCookieWithJwtAccessToken(req.user.email);
+    console.log(payload.accessToken);
+    res.cookie("Authentication", payload.accessToken);
 
     return HttpStatus.OK;
   }
 
-  // @UseGuards(JwtStrategy)
+  @UseGuards(JwtStrategy)
   @Get("profile")
   getProfile(@Request() req) {
-    return req.user;
+    const user = req.body;
+    console.log(user);
+
+    return "profile";
   }
 
   @Get("google")

@@ -8,6 +8,10 @@ import { UsersService } from "src/users/users.service";
 import { JwtPayload } from "../types/jwtPayload.type";
 import { JwtPayloadWithRt } from "../types/jwtPayloadWithRt.type";
 
+/**
+ * 리프레시 토큰을 이용해 액세스 토큰을 재발급
+ * 만약, 리프레시 토큰도 유효기간이 지났을 경우, 로그인 페이지로 이동시키게끔 처리
+ */
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(Strategy, "jwt-refresh") {
   constructor(private readonly configService: ConfigService, private readonly usersService: UsersService) {
@@ -17,7 +21,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, "jwt-refresh"
           try {
             return request?.cookies?.Refresh;
           } catch (error) {
-            throw new HttpException("Not Found your email", HttpStatus.NOT_FOUND);
+            throw new HttpException("refresh token error", HttpStatus.GATEWAY_TIMEOUT);
           }
         },
       ]),
@@ -27,10 +31,10 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, "jwt-refresh"
   }
 
   async validate(request: Request, payload: any) {
-    console.log("validate");
-    console.log(payload);
     const refreshToken = request.cookies?.Refresh;
-    return await this.usersService.getUserIfRefreshTokenMatches(refreshToken, payload.user.email);
+    console.log("JwtRefreshStrategy validate " + refreshToken);
+    const user = await this.usersService.getUserIfRefreshTokenMatches(refreshToken, payload.email);
+    return user;
   }
 }
 

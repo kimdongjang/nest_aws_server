@@ -11,6 +11,6 @@ import { SocialAuthentication } from "src/database/entities/SocialAuthentication
   imports: [EmailModule, TypeOrmModule.forFeature([User, LocalAuthenticaion, SocialAuthentication])],
   controllers: [UsersController],
   providers: [UsersService],
-  exports: [UsersService],
+  exports: [UsersService, TypeOrmModule, EmailModule],
 })
 export class UsersModule {}

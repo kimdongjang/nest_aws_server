@@ -17,11 +17,11 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
     // Add your custom authentication logic here
     // for example, call super.logIn(request) to establish a session.
     console.log("1. canActive 호출 ");
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [context.getHandler(), context.getClass()]);
-    if (isPublic) {
-      console.log("1-1. canActive 결과 : true ");
-      return true;
-    }
+    // const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [context.getHandler(), context.getClass()]);
+    // if (isPublic) {
+    //   console.log("1-1. canActive 결과 : true ");
+    //   return true;
+    // }
     return super.canActivate(context);
   }
   handleRequest<TUser = any>(err: any, user: any, info: any, context: any, status?: any): TUser {

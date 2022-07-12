@@ -133,7 +133,7 @@ export class AuthService {
     }
 
     const accessToken = this.jwtService.sign(
-      { user: user },
+      { email: user.email },
       {
         secret: this.configService.get("JWT_ACCESS_TOKEN_SECRET"),
         expiresIn: Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")),
@@ -141,12 +141,14 @@ export class AuthService {
     );
 
     const refreshToken = this.jwtService.sign(
-      { user: user },
+      { email: user.email },
       {
         secret: this.configService.get<string>("JWT_REFRESH_TOKEN_SECRET"),
         expiresIn: Number(this.configService.get("JWT_REFRESH_TOKEN_EXPIRATION_TIME")),
       }
     );
+
+    // refresh token을 유저 데이터베이스에 저장
     await this.usersService.setCurrentRefreshToken(refreshToken, user.email);
 
     return {
@@ -290,20 +292,18 @@ export class AuthService {
   }
 
   /**
-   * jwt 액세스 토큰을 가져온다.
+   * 유저 이메일을 통해 jwt 액세스 토큰을 가져온다.
    * @param email
    * @returns
    */
   async getCookieWithJwtAccessToken(email: string) {
-    const payload = { email };
     // const payload = await this.usersService.findByEmail(email);
     // return this.login(payload);
-
     const token = this.jwtService.sign(
-      { payload },
+      { email },
       {
         secret: this.configService.get("JWT_ACCESS_TOKEN_SECRET"),
-        expiresIn: `${this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")}s`,
+        expiresIn: Number(this.configService.get("JWT_ACCESS_TOKEN_EXPIRATION_TIME")),
       }
     );
 
