@@ -16,4 +16,15 @@ export class RedisController {
 
     return count;
   }
+
+  @Public()
+  @Post("/search")
+  async search(): Promise<number> {
+    let count: number = await this.cacheManager.get("visitor");
+    console.log("레디스 호출");
+
+    await this.cacheManager.set("visitor", ++count, { ttl: 1000 });
+
+    return count;
+  }
 }

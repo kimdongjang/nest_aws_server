@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ShopService } from "./shop.service";
 import { ElasticsearchModule } from "@nestjs/elasticsearch";
+import { ShopController } from "./shop.controller";
 
 @Module({
   imports: [
@@ -9,5 +10,6 @@ import { ElasticsearchModule } from "@nestjs/elasticsearch";
     }),
   ],
   providers: [ShopService],
+  controllers: [ShopController],
 })
 export class ShopModule {}
