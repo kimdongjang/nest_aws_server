@@ -19,7 +19,7 @@ import { BoardsModule } from "./boards/boards.module";
 import * as winston from "winston";
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from "nest-winston";
 import { RedisModule } from "./redis/redis.module";
-import { ShopModule } from './shop/shop.module';
+import { ShopModule } from "./shop/shop.module";
 
 // providers: nest injector에 의해 인스턴스화되고 모듈에서 공유되는 provider
 // controller: 인스턴스화해야하는 컨트롤러 세트

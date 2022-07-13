@@ -11,13 +11,23 @@ export class Shop {
   @Column()
   name: string;
   @Column()
-  zipid: number;
+  addressName: string;
   @Column()
-  hompageLink: string;
+  loadAddressName: string;
+  @Column()
+  homepageLink: string;
   @Column()
   callNumber: string;
-  @CreateDateColumn()
-  createAt: Date;
+  @Column()
+  categoryGroupCode: string;
+  @Column()
+  categoryGroupName: string;
+  @Column()
+  categoryName: string;
   @UpdateDateColumn()
   updateAt: Date;
+  @Column()
+  lng: number;
+  @Column()
+  lat: number;
 }

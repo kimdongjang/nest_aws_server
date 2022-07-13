@@ -18,7 +18,7 @@ export class RedisController {
   }
 
   @Public()
-  @Post("/search")
+  @Post("/shop/insert")
   async search(): Promise<number> {
     let count: number = await this.cacheManager.get("visitor");
     console.log("레디스 호출");
