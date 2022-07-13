@@ -46,9 +46,9 @@ export class ShopService {
     return data;
   }
 
-  async insertShop(dataList) {
+  insertShop(dataList) {
     const shopList = dataList.documents;
-    shopList.map(async data => {
+    shopList.map(data => {
       const shop = new Shop();
       shop.id = data.id;
       shop.addressName = data.address_name;
@@ -63,7 +63,7 @@ export class ShopService {
       shop.lng = data.x;
       shop.updateAt = new Date(Date.now());
 
-      await this.shopRepository.upsert(shop, ["id"]);
+      this.shopRepository.upsert(shop, ["id"]);
     });
   }
 }
