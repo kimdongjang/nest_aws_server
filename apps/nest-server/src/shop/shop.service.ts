@@ -4,7 +4,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import axios from "axios";
 import { lastValueFrom } from "rxjs";
 import { Shop } from "src/database/entities/Shop.entity";
-import { Repository } from "typeorm";
+import { createQueryBuilder, getManager, Repository } from "typeorm";
 import { SearchKeywordDto } from "./dto/searchKeywordDto";
 
 @Injectable()
@@ -40,15 +40,17 @@ export class ShopService {
       },
     };
     const { data } = await axios.get(url, config);
-    console.log(data);
+
     this.insertShop(data);
 
-    return data;
+    const value = await this.findShop(dto.lat, dto.lng, dto.radius, dto.keyword);
+    console.log(value);
+
+    return value;
   }
 
-  insertShop(dataList) {
-    const shopList = dataList.documents;
-    shopList.map(data => {
+  async insertShop(dataList) {
+    dataList.documents.map(data => {
       const shop = new Shop();
       shop.id = data.id;
       shop.addressName = data.address_name;
@@ -65,5 +67,21 @@ export class ShopService {
 
       this.shopRepository.upsert(shop, ["id"]);
     });
+  }
+  async findShop(lat, lng, radius, keyword) {
+    const entityManager = getManager();
+    const dataList = [];
+
+    const shopList = await entityManager.query(`
+    SELECT
+    *,
+    ( 6371 * acos( cos( radians(${lat}) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(${lng}) ) + sin( radians(${lat}) ) * sin( radians( lat ) ) ) ) AS distance
+    FROM maindatabase.shop
+    where name like '%${keyword}%'
+    HAVING distance <= ${radius}
+    ORDER BY distance ASC    
+    `);
+
+    return JSON.parse(JSON.stringify(shopList));
   }
 }
