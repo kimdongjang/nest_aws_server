@@ -23,6 +23,22 @@ nest-server : 4949
 react-client : 4900(80)  
 next-server : 3000
 
+## Kakao Api를 통한 음식점 조회 서비스
+### Stack  
+- Redis  
+- ElasticSearch  
+- Mysql  
+
+### 흐름
+![image](https://user-images.githubusercontent.com/41901043/178901457-b411952d-8607-4204-8e34-fc7e711e4bc4.png)
+
+### 음식점 조회 Request 처리 방법
+1. 브라우저에서 위치 정보와 음식점 정보를 담아서 request
+2. redis의 캐시에서 조회, 위치 정보에 기반해 radius(반경 n km)에 음식점 리스트가 있는지 확인하고 리턴
+3. 정보가 없거나 음식점 리스트가 없을 경우 ElasticSearch에서 Rest로 조회
+4. 정보가 없을 경우 Kakao Map API를 통해 lat,lng,radius,keyword로 음식점 리스트를 조회하고 mysql, elasticsearch, redis에 업데이트
+
+
 # SMTP 설정파일
 
 ## .env
