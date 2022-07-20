@@ -76,7 +76,7 @@ import { ShopModule } from "./shop/shop.module";
     DatabaseModule,
     EventsModule,
     BoardsModule,
-    RedisModule,
+    // RedisModule,
     ShopModule,
   ],
   /**
