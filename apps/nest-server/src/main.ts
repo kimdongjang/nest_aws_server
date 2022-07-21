@@ -2,6 +2,7 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import * as dotenv from "dotenv";
 import * as path from "path";
+import * as fs from "fs";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { setupSwagger } from "./config/swagger.config";
 import { LoggerMiddleware } from "./logger.middleware";
@@ -13,7 +14,14 @@ dotenv.config({
 });
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const httpsOptions = {
+    key: fs.readFileSync("./cert/privkey.pem"),
+    cert: fs.readFileSync("./cert/cert.pem"),
+  };
+
+  const app = await NestFactory.create(AppModule, {
+    httpsOptions,
+  });
   // swagger 등록
   setupSwagger(app);
 

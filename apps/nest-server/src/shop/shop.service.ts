@@ -75,10 +75,10 @@ export class ShopService {
     const shopList = await entityManager.query(`
     SELECT
     *,
-    ( 6371 * acos( cos( radians(${lat}) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(${lng}) ) + sin( radians(${lat}) ) * sin( radians( lat ) ) ) ) AS distance
-    FROM maindatabase.shop
-    where name like '%${keyword}%'
-    HAVING distance <= ${radius}
+    ( 6371 * acos( cos( radians(${lat}) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(${lng}) ) + sin( radians(${lat}) ) * sin( radians( lat ) ) ) ) AS distance 
+    FROM maindatabase.shop 
+    where name like '%${keyword}%' 
+    HAVING distance <= ${radius} 
     ORDER BY distance ASC    
     `);
 
