@@ -4,7 +4,7 @@ import { SearchKeywordDto } from "./dto/searchKeywordDto";
 import { ShopService } from "./shop.service";
 
 @ApiTags("ShopApi")
-@Controller("shop")
+@Controller("/api/shop")
 export class ShopController {
   constructor(private shopService: ShopService) {}
 
