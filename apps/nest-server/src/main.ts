@@ -14,14 +14,24 @@ dotenv.config({
 });
 
 async function bootstrap() {
-  const httpsOptions = {
-    key: fs.readFileSync("./cert/privkey.pem"),
-    cert: fs.readFileSync("./cert/cert.pem"),
-  };
+  /**
+   * use https
+   */
 
-  const app = await NestFactory.create(AppModule, {
-    httpsOptions,
-  });
+  /*
+   const httpsOptions = {
+     key: fs.readFileSync("./cert/privkey.pem"),
+     cert: fs.readFileSync("./cert/cert.pem"),
+   };
+   const app = await NestFactory.create(AppModule, {
+     httpsOptions,
+   });
+  */
+
+  /**
+   * use http
+   */
+  const app = await NestFactory.create(AppModule);
   // swagger 등록
   setupSwagger(app);
 

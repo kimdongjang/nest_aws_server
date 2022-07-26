@@ -40,7 +40,7 @@ export class ShopService {
       },
     };
     const { data } = await axios.get(url, config);
-
+    console.log(data);
     this.insertShop(data);
 
     const value = await this.findShop(dto.lat, dto.lng, dto.radius, dto.keyword);
