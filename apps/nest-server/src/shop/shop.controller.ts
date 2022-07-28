@@ -10,6 +10,6 @@ export class ShopController {
 
   @Get("search/list")
   async searchShopList(@Query() dto: SearchKeywordDto) {
-    return await this.shopService.searchShopList(dto);
+    return await this.shopService.searchShopListToApi(dto);
   }
 }

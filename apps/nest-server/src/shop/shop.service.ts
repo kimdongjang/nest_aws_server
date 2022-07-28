@@ -14,8 +14,13 @@ export class ShopService {
     @InjectRepository(Shop)
     private shopRepository: Repository<Shop>
   ) {}
-
   async searchShopList(dto: SearchKeywordDto) {
+    const value = await this.findShop(dto.lat, dto.lng, dto.radius, dto.keyword);
+
+    return value;
+  }
+
+  async searchShopListToApi(dto: SearchKeywordDto) {
     // const keyword = dto.keyword;
 
     // if (!keyword.replace(/^\s+|\s+$/g, "")) {
@@ -70,7 +75,6 @@ export class ShopService {
   }
   async findShop(lat, lng, radius, keyword) {
     const entityManager = getManager();
-    const dataList = [];
 
     const shopList = await entityManager.query(`
     SELECT
