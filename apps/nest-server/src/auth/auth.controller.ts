@@ -41,9 +41,12 @@ export class AuthController {
    */
   @UseGuards(LocalAuthGuard)
   @Post("login")
+  @HttpCode(HttpStatus.OK)
   async login(@Body() body: UserLoginDto, @Res({ passthrough: true }) res: Response) {
     const payload = await this.authService.login(body);
 
+    console.log(payload.accessToken);
+    console.log(payload.refreshToken);
     // 쿠키에 jwt토큰과 refresh 토큰을 저장
     res.cookie("Authentication", payload.accessToken);
     res.cookie("Refresh", payload.refreshToken);
