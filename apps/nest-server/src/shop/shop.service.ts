@@ -15,7 +15,8 @@ export class ShopService {
     private shopRepository: Repository<Shop>
   ) {}
   async searchShopList(dto: SearchKeywordDto) {
-    const value = await this.findShop(dto.lat, dto.lng, dto.radius, dto.keyword);
+    const value = await this.searchShopListToApi(dto);
+    // const value = await this.findShop(dto.lat, dto.lng, dto.radius, dto.keyword);
 
     return value;
   }
@@ -45,7 +46,7 @@ export class ShopService {
       },
     };
     const { data } = await axios.get(url, config);
-    console.log(data);
+    // console.log(data);
     this.insertShop(data);
 
     const value = await this.findShop(dto.lat, dto.lng, dto.radius, dto.keyword);
