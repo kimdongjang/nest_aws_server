@@ -19,7 +19,7 @@ export class BoardsService {
     return;
   }
 
-  getBoard(id: string) {
+  getBoard(id: number) {
     return this.boardRepository.find({ where: { id: id } });
   }
 }

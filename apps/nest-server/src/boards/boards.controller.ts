@@ -32,7 +32,7 @@ export class BoardsController {
   }
 
   @Get("/:id")
-  async getBoard(@Param("id") id: string) {
+  async getBoard(@Param("id") id: number) {
     return await this.boardService.getBoard(id);
   }
 }

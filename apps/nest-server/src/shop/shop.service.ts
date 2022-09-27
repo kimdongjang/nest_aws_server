@@ -4,7 +4,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import axios from "axios";
 import { lastValueFrom } from "rxjs";
 import { Shop } from "src/database/entities/Shop.entity";
-import { createQueryBuilder, getManager, Repository } from "typeorm";
+import { createQueryBuilder, getManager, getRepository, Repository } from "typeorm";
 import { SearchKeywordDto } from "./dto/searchKeywordDto";
 
 @Injectable()
@@ -50,7 +50,7 @@ export class ShopService {
     this.insertShop(data);
 
     const value = await this.findShop(dto.lat, dto.lng, dto.radius, dto.keyword);
-    console.log(value);
+    console.log("request keyword : " + dto.keyword);
 
     return value;
   }
@@ -75,9 +75,9 @@ export class ShopService {
     });
   }
   async findShop(lat, lng, radius, keyword) {
-    const entityManager = getManager();
+    // const entityManager = getManager();
 
-    const shopList = await entityManager.query(`
+    const shopList = await Shop.query(`
     SELECT
     *,
     ( 6371 * acos( cos( radians(${lat}) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(${lng}) ) + sin( radians(${lat}) ) * sin( radians( lat ) ) ) ) AS distance 
