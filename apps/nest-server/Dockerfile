@@ -1,19 +1,24 @@
-FROM node:lts-alpine3.10 as builder
+FROM node:lts-alpine as builder
+RUN apk --no-cache add --virtual builds-deps build-base python
 
-ARG NODE_ENV
-ARG BUILD_FLAG
-WORKDIR /nest-server/builder
+WORKDIR /usr/src/app
+COPY package* ./
 
+# install dependencies
+RUN npm install --silent
 COPY . .
-RUN npm i
-RUN npx @nestjs/cli build
 
 
+# build application
+RUN npm run build
 
-FROM node:lts-alpine3.10
+FROM node:12-alpine
 
-WORKDIR /nest-server
-COPY --from=builder /nest-server/builder ./
-# ENV NODE_ENV=$NODE_ENV
+WORKDIR /usr/src/app
 
-CMD ["npm", "run", "start:production"]
+COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+
+EXPOSE 4949
+
+CMD [ "node", "./dist/main" ]
