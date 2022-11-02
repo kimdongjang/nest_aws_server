@@ -1,5 +1,5 @@
 FROM node:lts-alpine as builder
-RUN apk --no-cache add --virtual builds-deps build-base python
+RUN apk --no-cache add --virtual builds-deps build-base
 
 WORKDIR /usr/src/app
 COPY package* ./
