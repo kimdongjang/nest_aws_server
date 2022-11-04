@@ -22,16 +22,6 @@ export class ShopService {
   }
 
   async searchShopListToApi(dto: SearchKeywordDto) {
-    // const keyword = dto.keyword;
-
-    // if (!keyword.replace(/^\s+|\s+$/g, "")) {
-    //   return {
-    //     status: HttpStatus.BAD_REQUEST,
-    //     data: null,
-    //     error: ["keyword is empty"],
-    //   };
-    // }
-
     //https://developers.kakao.com/docs/latest/ko/local/dev-guide#search-by-keyword-sample
     const url = "https://dapi.kakao.com/v2/local/search/keyword.json";
     const config = {
@@ -46,11 +36,13 @@ export class ShopService {
       },
     };
     const { data } = await axios.get(url, config);
+    console.log(data);
     // console.log(data);
     this.insertShop(data);
 
     const value = await this.findShop(dto.lat, dto.lng, dto.radius, dto.keyword);
-    console.log("request keyword : " + dto.keyword);
+    // console.log("request keyword : " + dto.keyword);
+    // console.log(value);
 
     return value;
   }
